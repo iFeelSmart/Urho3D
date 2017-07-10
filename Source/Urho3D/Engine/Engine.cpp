@@ -167,13 +167,18 @@ bool Engine::Initialize(const VariantMap& parameters)
 
     URHO3D_PROFILE(InitEngine);
 
+    bool bUseExternalGLContext = false;
+
     // Set headless mode
     headless_ = GetParameter(parameters, EP_HEADLESS, false).GetBool();
-
+    if (!headless_)
+    {
+        bUseExternalGLContext = GetParameter(parameters, "UseExternalGLContext", false).GetBool();
+    }
     // Register the rest of the subsystems
     if (!headless_)
     {
-        context_->RegisterSubsystem(new Graphics(context_));
+        context_->RegisterSubsystem(new Graphics(context_, bUseExternalGLContext));
         context_->RegisterSubsystem(new Renderer(context_));
     }
     else
@@ -229,36 +234,56 @@ bool Engine::Initialize(const VariantMap& parameters)
         auto* graphics = GetSubsystem<Graphics>();
         auto* renderer = GetSubsystem<Renderer>();
 
-        if (HasParameter(parameters, EP_EXTERNAL_WINDOW))
-            graphics->SetExternalWindow(GetParameter(parameters, EP_EXTERNAL_WINDOW).GetVoidPtr());
-        graphics->SetWindowTitle(GetParameter(parameters, EP_WINDOW_TITLE, "Urho3D").GetString());
-        graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, EP_WINDOW_ICON, String::EMPTY).GetString()));
+        if( !bUseExternalGLContext )
+        {
+            if (HasParameter(parameters, EP_EXTERNAL_WINDOW))
+                graphics->SetExternalWindow(GetParameter(parameters, EP_EXTERNAL_WINDOW).GetVoidPtr());
+            graphics->SetWindowTitle(GetParameter(parameters, EP_WINDOW_TITLE, "Urho3D").GetString());
+            graphics->SetWindowIcon(cache->GetResource<Image>(GetParameter(parameters, EP_WINDOW_ICON, String::EMPTY).GetString()));
+        }
         graphics->SetFlushGPU(GetParameter(parameters, EP_FLUSH_GPU, false).GetBool());
-        graphics->SetOrientations(GetParameter(parameters, EP_ORIENTATIONS, "LandscapeLeft LandscapeRight").GetString());
 
-        if (HasParameter(parameters, EP_WINDOW_POSITION_X) && HasParameter(parameters, EP_WINDOW_POSITION_Y))
-            graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
-                GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
+        if( !bUseExternalGLContext )
+        {
+            graphics->SetOrientations(GetParameter(parameters, EP_ORIENTATIONS, "LandscapeLeft LandscapeRight").GetString());
+
+            if (HasParameter(parameters, EP_WINDOW_POSITION_X) && HasParameter(parameters, EP_WINDOW_POSITION_Y))
+                graphics->SetWindowPosition(GetParameter(parameters, EP_WINDOW_POSITION_X).GetInt(),
+                    GetParameter(parameters, EP_WINDOW_POSITION_Y).GetInt());
+        }
 
 #ifdef URHO3D_OPENGL
         if (HasParameter(parameters, EP_FORCE_GL2))
             graphics->SetForceGL2(GetParameter(parameters, EP_FORCE_GL2).GetBool());
 #endif
-
-        if (!graphics->SetMode(
-            GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
-            GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
-            GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
-            GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
-            GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
-            GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
-            GetParameter(parameters, EP_VSYNC, false).GetBool(),
-            GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
-            GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
-            GetParameter(parameters, EP_MONITOR, 0).GetInt(),
-            GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
-        ))
-            return false;
+        if( !bUseExternalGLContext )
+        {
+            if (!graphics->SetMode(
+                GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
+                GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
+                GetParameter(parameters, EP_FULL_SCREEN, true).GetBool(),
+                GetParameter(parameters, EP_BORDERLESS, false).GetBool(),
+                GetParameter(parameters, EP_WINDOW_RESIZABLE, false).GetBool(),
+                GetParameter(parameters, EP_HIGH_DPI, true).GetBool(),
+                GetParameter(parameters, EP_VSYNC, false).GetBool(),
+                GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
+                GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
+                GetParameter(parameters, EP_MONITOR, 0).GetInt(),
+                GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
+            ))
+                return false;
+        }
+        else
+        {
+            if (!graphics->SetMode(
+                  GetParameter(parameters, EP_WINDOW_WIDTH, 0).GetInt(),
+                  GetParameter(parameters, EP_WINDOW_HEIGHT, 0).GetInt(),
+                  GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
+                  GetParameter(parameters, "GLContext", 0 ).GetVoidPtr(),
+                  GetParameter(parameters, "DefaultFrameBufferObject", 0).GetInt()
+              ))
+                  return false;
+        }
 
         graphics->SetShaderCacheDir(GetParameter(parameters, EP_SHADER_CACHE_DIR, fileSystem->GetAppPreferencesDir("urho3d", "shadercache")).GetString());
 

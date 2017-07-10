@@ -30,7 +30,6 @@
 
 namespace Urho3D
 {
-
 void ConstantBuffer::OnDeviceReset()
 {
 }

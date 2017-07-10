@@ -220,7 +220,7 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 bool Graphics::gl3Support = false;
 
-Graphics::Graphics(Context* context) :
+Graphics::Graphics(Context* context, bool bUseExternalGLContext) :
     Object(context),
     impl_(new GraphicsImpl()),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
@@ -238,7 +238,8 @@ Graphics::Graphics(Context* context) :
     SetTextureUnitMappings();
     ResetCachedState();
 
-    context_->RequireSDL(SDL_INIT_VIDEO);
+    if( !bUseExternalGLContext )
+        context_->RequireSDL(SDL_INIT_VIDEO);
 
     // Register Graphics library object factories
     RegisterGraphicsLibrary(context_);
@@ -248,10 +249,101 @@ Graphics::~Graphics()
 {
     Close();
 
+    bool bUseExternalContext = impl_->externalContext_;
+
     delete impl_;
     impl_ = nullptr;
 
-    context_->ReleaseSDL();
+    if( !bUseExternalContext )
+       context_->ReleaseSDL();
+}
+
+void Graphics::SetSize( int width, int height )
+{
+    width_ = width;
+    height_ = height;
+
+    // Reset rendertargets and viewport for the new screen size. Also clean up any FBO's, as they may be screen size dependent
+    CleanupFramebuffers();
+    ResetRenderTargets();
+
+    using namespace ScreenMode;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WIDTH] = width_;
+    eventData[P_HEIGHT] = height_;
+    eventData[P_FULLSCREEN] = fullscreen_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_BORDERLESS] = borderless_;
+    SendEvent(E_SCREENMODE, eventData);
+}
+
+void Graphics::SetGetSystemFBOFunc( void* pFunc )
+{
+    impl_->getSystemFBOFunc = (GraphicsImpl::getSystemFBOFunctionPtr)pFunc;
+}
+
+bool Graphics::SetMode( int width, int height, int multisample, void* glContext, unsigned int iDefaultFrameBuffer )
+{
+    URHO3D_PROFILE(SetScreenMode);
+
+    // With an external window, only the size can change after initial setup, so do not recreate context
+    if (!externalWindow_ || !impl_->context_)
+    {
+        // Close the existing window and OpenGL context, mark GPU objects as lost
+        if( !impl_->externalContext_ )
+            Release(false, true);
+
+        impl_->externalContext_ = true;
+        impl_->context_         = glContext;
+        impl_->systemFBO_       = iDefaultFrameBuffer;
+    }
+
+    fullscreen_ = false;
+    borderless_ = true;
+    resizable_ = true;
+    highDPI_ = false;
+    vsync_ = false;
+    tripleBuffer_ = false;
+    multiSample_ = multisample;
+    width_ = width;
+    height_ = height;
+
+    // Create/restore context and GPU objects and set initial renderstate
+    Restore();
+
+    // Reset rendertargets and viewport for the new screen mode
+    ResetRenderTargets();
+
+    // Clear the initial window contents to black
+    Clear(CLEAR_COLOR);
+
+    CheckFeatureSupport();
+
+#ifdef URHO3D_LOGGING
+    String msg;
+    msg.AppendWithFormat("Set screen mode %dx%d %s", width_, height_, (fullscreen_ ? "fullscreen" : "windowed"));
+    if (borderless_)
+        msg.Append(" borderless");
+    if (resizable_)
+        msg.Append(" resizable");
+    URHO3D_LOGINFO(msg);
+#endif
+
+    using namespace ScreenMode;
+
+    VariantMap& eventData = GetEventDataMap();
+    eventData[P_WIDTH] = width_;
+    eventData[P_HEIGHT] = height_;
+    eventData[P_FULLSCREEN] = fullscreen_;
+    eventData[P_BORDERLESS] = borderless_;
+    eventData[P_RESIZABLE] = resizable_;
+    eventData[P_HIGHDPI] = highDPI_;
+    eventData[P_MONITOR] = monitor_;
+    eventData[P_REFRESHRATE] = refreshRate_;
+    SendEvent(E_SCREENMODE, eventData);
+
+    return true;
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
@@ -653,7 +745,8 @@ void Graphics::EndFrame()
 
     SendEvent(E_ENDRENDERING);
 
-    SDL_GL_SwapWindow(window_);
+    if( !impl_->externalContext_ )
+      SDL_GL_SwapWindow(window_);
 
     // Clean up too large scratch buffers
     CleanupScratchBuffers();
@@ -2048,7 +2141,7 @@ void Graphics::SetStencilTest(bool enable, CompareMode mode, StencilOp pass, Ste
 
 bool Graphics::IsInitialized() const
 {
-    return window_ != nullptr;
+    return window_ != nullptr || ( impl_->externalContext_ && impl_->context_ != 0 );
 }
 
 bool Graphics::GetDither() const
@@ -2360,7 +2453,7 @@ ConstantBuffer* Graphics::GetOrCreateConstantBuffer(ShaderType /*type*/,  unsign
 
 void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 {
-    if (!window_)
+    if ( !window_ && !impl_->externalContext_ )
         return;
 
     {
@@ -2399,7 +2492,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         SDL_SetWindowFullscreen(window_, 0);
 #endif
 
-    if (impl_->context_)
+    if (impl_->context_ && !impl_->externalContext_ )
     {
         // Do not log this message if we are exiting
         if (!clearGPUObjects)
@@ -2409,7 +2502,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
         impl_->context_ = nullptr;
     }
 
-    if (closeWindow)
+    if (closeWindow && !impl_->externalContext_ )
     {
         SDL_ShowCursor(SDL_TRUE);
 
@@ -2424,7 +2517,7 @@ void Graphics::Release(bool clearGPUObjects, bool closeWindow)
 
 void Graphics::Restore()
 {
-    if (!window_)
+    if (!window_ && !impl_->externalContext_)
         return;
 
 #ifdef __ANDROID__
@@ -2439,13 +2532,14 @@ void Graphics::Restore()
 #endif
 
     // Ensure first that the context exists
-    if (!impl_->context_)
+    if (!impl_->context_ || impl_->externalContext_ )
     {
-        impl_->context_ = SDL_GL_CreateContext(window_);
+        if( !impl_->externalContext_ )
+            impl_->context_ = SDL_GL_CreateContext(window_);
 
 #ifndef GL_ES_VERSION_2_0
         // If we're trying to use OpenGL 3, but context creation fails, retry with 2
-        if (!forceGL2_ && !impl_->context_)
+        if (!forceGL2_ && !impl_->context_ && !impl_->externalContext_ )
         {
             forceGL2_ = true;
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
@@ -2862,10 +2956,11 @@ void Graphics::PrepareDraw()
 
         if (noFbo)
         {
-            if (impl_->boundFBO_ != impl_->systemFBO_)
+            unsigned currentSystemFBO_ = impl_->getSystemFBOFunc( impl_ );
+            if (impl_->boundFBO_ != currentSystemFBO_)
             {
-                BindFramebuffer(impl_->systemFBO_);
-                impl_->boundFBO_ = impl_->systemFBO_;
+                BindFramebuffer(currentSystemFBO_);
+                impl_->boundFBO_ = currentSystemFBO_;
             }
 
 #ifndef GL_ES_VERSION_2_0
@@ -3147,8 +3242,10 @@ void Graphics::CleanupFramebuffers()
 {
     if (!IsDeviceLost())
     {
-        BindFramebuffer(impl_->systemFBO_);
-        impl_->boundFBO_ = impl_->systemFBO_;
+        unsigned currentSystemFBO_ = impl_->getSystemFBOFunc( impl_ );
+
+        BindFramebuffer(currentSystemFBO_);
+        impl_->boundFBO_ = currentSystemFBO_;
         impl_->fboDirty_ = true;
 
         for (HashMap<unsigned long long, FrameBufferObject>::Iterator i = impl_->frameBuffers_.Begin();
@@ -3215,7 +3312,7 @@ void Graphics::ResetCachedState()
     impl_->enabledVertexAttributes_ = 0;
     impl_->usedVertexAttributes_ = 0;
     impl_->instancingVertexAttributes_ = 0;
-    impl_->boundFBO_ = impl_->systemFBO_;
+    impl_->boundFBO_ = impl_->getSystemFBOFunc( impl_ );
     impl_->boundVBO_ = 0;
     impl_->boundUBO_ = 0;
     impl_->sRGBWrite_ = false;

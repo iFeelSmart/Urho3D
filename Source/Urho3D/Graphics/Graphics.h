@@ -84,9 +84,13 @@ class URHO3D_API Graphics : public Object
 
 public:
     /// Construct.
-    explicit Graphics(Context* context);
+    explicit Graphics(Context* context, bool bUseExternalGLContext = false);
+
     /// Destruct. Release the Direct3D11 device and close the window.
     ~Graphics() override;
+
+    void SetSize( int width, int height );
+    void SetGetSystemFBOFunc( void* pFunc );
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);
@@ -99,6 +103,7 @@ public:
     /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
+    bool SetMode(int width, int height, int multisample, void* glContext, unsigned int iDefaultFrameBuffer );
     bool SetMode
         (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
             int multiSample, int monitor, int refreshRate);
