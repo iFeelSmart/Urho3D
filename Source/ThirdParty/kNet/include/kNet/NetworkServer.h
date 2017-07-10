@@ -43,6 +43,8 @@ public:
 	/// Enters a stand-alone processing loop that manages incoming connections until server is shut down.
 	void RunModalServer();
 
+    void StopModalServer();
+
 	/// Enables or disables whether new connection attempts are allowed.
 	void SetAcceptNewConnections(bool acceptNewConnections);
 
@@ -138,6 +140,8 @@ private:
 
 	/// If true, new connection attempts are processed. Otherwise, just discard all connection packets.
 	bool acceptNewConnections;
+
+    bool modalServerRunning;
 
 	INetworkServerListener *networkServerListener;
 

@@ -47,6 +47,7 @@ workerThread(0),
 workerThreadId(Thread::NullThreadId()),
 #endif
 acceptNewConnections(true), 
+modalServerRunning(false),
 networkServerListener(0),
 udpConnectionAttempts(64)
 {
@@ -453,14 +454,21 @@ void NetworkServer::RunModalServer()
 {
 	assert(this);
 
+    modalServerRunning = true;
+
 	///\todo Loop until StopModalServer() is called.
-	for(;;)
+    while( modalServerRunning )
 	{
 		Process();
 
 		///\todo WSACreateEvent/WSAWaitForMultipleEvents for improved responsiveness and performance.
 		Clock::Sleep(1);
-	}
+    }
+}
+
+void NetworkServer::StopModalServer()
+{
+    modalServerRunning = false;
 }
 
 void NetworkServer::ConnectionClosed(MessageConnection *connection)
