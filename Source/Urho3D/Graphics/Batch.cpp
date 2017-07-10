@@ -217,8 +217,15 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             graphics->SetDepthBias(depthBias.constantBias_, depthBias.slopeScaledBias_);
         }
 
-        // Use the "least filled" fill mode combined from camera & material
-        graphics->SetFillMode((FillMode)(Max(camera->GetFillMode(), material_->GetFillMode())));
+        if( material_->GetFillModeOverrideCamera() )
+        {
+            graphics->SetFillMode( material_->GetFillMode() );
+        }
+        else
+        {
+            // Use the "least filled" fill mode combined from camera & material
+            graphics->SetFillMode((FillMode)(Max(camera->GetFillMode(), material_->GetFillMode())));
+        }
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }
@@ -735,11 +742,11 @@ void BatchQueue::SortBackToFront()
     Sort(sortedBatches_.Begin(), sortedBatches_.End(), CompareBatchesBackToFront);
 
     sortedBatchGroups_.Resize(batchGroups_.Size());
-    
+
     unsigned index = 0;
     for (HashMap<BatchGroupKey, BatchGroup>::Iterator i = batchGroups_.Begin(); i != batchGroups_.End(); ++i)
         sortedBatchGroups_[index++] = &i->second_;
-    
+
     Sort(sortedBatchGroups_.Begin(), sortedBatchGroups_.End(), CompareBatchGroupOrder);
 }
 
