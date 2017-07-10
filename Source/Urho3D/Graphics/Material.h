@@ -161,6 +161,8 @@ public:
     void SetShadowCullMode(CullMode mode);
     /// Set polygon fill mode. Interacts with the camera's fill mode setting so that the "least filled" mode will be used.
     void SetFillMode(FillMode mode);
+    /// Set polygon fill mode override camera
+    void SetFillModeOverrideCamera( bool override );
     /// Set depth bias parameters for depth write and compare. Note that the normal offset parameter is not used and will not be saved, as it affects only shadow map sampling during light rendering.
     void SetDepthBias(const BiasParameters& parameters);
     /// Set alpha-to-coverage mode on all passes.
@@ -227,6 +229,9 @@ public:
 
     /// Return polygon fill mode.
     FillMode GetFillMode() const { return fillMode_; }
+
+    /// Return polygon fill mode overwrite camera.
+    bool GetFillModeOverrideCamera() { return fillModeOverrideCamera_; }
 
     /// Return depth bias.
     const BiasParameters& GetDepthBias() const { return depthBias_; }
@@ -299,6 +304,8 @@ private:
     CullMode shadowCullMode_{};
     /// Polygon fill mode.
     FillMode fillMode_{};
+    /// Polygon fill override camera fill mode
+    bool fillModeOverrideCamera_{};
     /// Depth bias parameters.
     BiasParameters depthBias_{};
     /// Render order value.

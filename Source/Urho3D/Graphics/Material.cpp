@@ -1086,6 +1086,11 @@ void Material::SetFillMode(FillMode mode)
     fillMode_ = mode;
 }
 
+void Material::SetFillModeOverrideCamera(bool override)
+{
+    fillModeOverrideCamera_ = override;
+}
+
 void Material::SetDepthBias(const BiasParameters& parameters)
 {
     depthBias_ = parameters;
@@ -1274,6 +1279,7 @@ void Material::ResetToDefaults()
     cullMode_ = CULL_CCW;
     shadowCullMode_ = CULL_CCW;
     fillMode_ = FILL_SOLID;
+    fillModeOverrideCamera_ = false;
     depthBias_ = BiasParameters(0.0f, 0.0f);
     renderOrder_ = DEFAULT_RENDER_ORDER;
     occlusion_ = true;

@@ -217,8 +217,15 @@ void Batch::Prepare(View* view, Camera* camera, bool setModelTransform, bool all
             graphics->SetDepthBias(depthBias.constantBias_, depthBias.slopeScaledBias_);
         }
 
-        // Use the "least filled" fill mode combined from camera & material
-        graphics->SetFillMode((FillMode)(Max(camera->GetFillMode(), material_->GetFillMode())));
+        if( material_->GetFillModeOverrideCamera() )
+        {
+            graphics->SetFillMode( material_->GetFillMode() );
+        }
+        else
+        {
+            // Use the "least filled" fill mode combined from camera & material
+            graphics->SetFillMode((FillMode)(Max(camera->GetFillMode(), material_->GetFillMode())));
+        }
         graphics->SetDepthTest(pass_->GetDepthTestMode());
         graphics->SetDepthWrite(pass_->GetDepthWrite() && allowDepthWrite);
     }
