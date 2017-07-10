@@ -98,7 +98,9 @@ void Graphics::SetWindowPosition(int x, int y)
 void Graphics::SetOrientations(const String& orientations)
 {
     orientations_ = orientations.Trimmed();
-    SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
+
+    if( !impl_->externalContext_ )
+        SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 }
 
 bool Graphics::ToggleFullscreen()

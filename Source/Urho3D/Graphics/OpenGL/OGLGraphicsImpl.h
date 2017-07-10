@@ -110,10 +110,17 @@ public:
 
     /// Return the GL Context.
     const SDL_GLContext& GetGLContext() { return context_; }
+    void                 SetGLContext( const SDL_GLContext& context )            { context_ = context; externalContext_ = true; }
 
 private:
+    typedef unsigned (*getSystemFBOFunctionPtr)( void* );
+    static unsigned getDefaultSystemFBO( void* pImpl );
+
     /// SDL OpenGL context.
-    SDL_GLContext context_;
+    bool                    externalContext_;
+    SDL_GLContext           context_;
+    getSystemFBOFunctionPtr getSystemFBOFunc;
+
     /// iOS/tvOS system framebuffer handle.
     unsigned systemFBO_;
     /// Active texture unit.
