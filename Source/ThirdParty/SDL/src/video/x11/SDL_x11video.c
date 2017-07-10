@@ -438,7 +438,7 @@ X11_VideoInit(_THIS)
 
         /* Reset the locale + X locale modifiers back to how they were,
            locale first because the X locale modifiers depend on it. */
-        setlocale(LC_ALL, prev_locale);
+        setlocale(LC_ALL, "en_US" /*prev_locale*/ );
         X11_XSetLocaleModifiers(prev_xmods);
 
         if (prev_locale) {
