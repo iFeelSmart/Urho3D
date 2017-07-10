@@ -71,7 +71,11 @@ Script::Script(Context* context) :
     scriptEngine_(nullptr),
     immediateContext_(nullptr),
     scriptNestingLevel_(0),
-    executeConsoleCommands_(false)
+	executeConsoleCommands_(false),
+	m_pContextRequestedFunc(0),
+	m_pContextRequestedUserPtr(0),
+	m_pContextReleasedFunc(0),
+	m_pContextReleasedUserPtr(0)
 {
     scriptEngine_ = asCreateScriptEngine(ANGELSCRIPT_VERSION);
     if (!scriptEngine_)
@@ -347,6 +351,22 @@ const char **Script::GetEnumValues(int asTypeID)
     }
     enumValues_[asTypeID][count] = nullptr;
     return enumValues_[asTypeID].Buffer();
+}
+
+void Script::IncScriptNestingLevel()
+{
+	if( m_pContextRequestedFunc )
+		m_pContextRequestedFunc( scriptFileContexts_.Back(), m_pContextRequestedUserPtr );
+
+	++scriptNestingLevel_;
+}
+
+void Script::DecScriptNestingLevel()
+{
+	--scriptNestingLevel_;
+
+	if( m_pContextReleasedFunc )
+		m_pContextReleasedFunc( scriptFileContexts_[ scriptNestingLevel_ ], m_pContextReleasedUserPtr );
 }
 
 asIScriptContext* Script::GetScriptFileContext()

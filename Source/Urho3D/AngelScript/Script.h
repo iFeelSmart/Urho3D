@@ -58,6 +58,10 @@ class URHO3D_API Script : public Object
     friend class ScriptFile;
 
 public:
+
+	typedef void (*ContextRequestedFunc_t)(asIScriptContext *, void *);
+	typedef void (*ContextReleasedFunc_t)(asIScriptContext *, void *);
+
     /// Construct.
     explicit Script(Context* context);
     /// Destruct. Release the AngelScript engine.
@@ -105,13 +109,19 @@ public:
     /// Returns an array of strings of enum value names for Enum Attributes.
     const char** GetEnumValues(int asTypeID);
 
+    /// Get all Script Contexts
+	const Vector<asIScriptContext*>& getScriptContexts() { return scriptFileContexts_; }
+
+    /// Contexts Hooks
+	void setContextRequestedFunc( ContextRequestedFunc_t func, void* user )		{ m_pContextRequestedFunc = func; m_pContextRequestedUserPtr = user; }
+	void setContextReleasedFunc( ContextReleasedFunc_t func, void* user )		{ m_pContextReleasedFunc = func; m_pContextReleasedUserPtr = user; }
 
 private:
     /// Increase script nesting level.
-    void IncScriptNestingLevel() { ++scriptNestingLevel_; }
+    void IncScriptNestingLevel();
 
     /// Decrease script nesting level.
-    void DecScriptNestingLevel() { --scriptNestingLevel_; }
+    void DecScriptNestingLevel();
 
     /// Return current script nesting level.
     unsigned GetScriptNestingLevel() { return scriptNestingLevel_; }
@@ -145,6 +155,12 @@ private:
     unsigned scriptNestingLevel_;
     /// Flag for executing engine console commands as script code. Default to true.
     bool executeConsoleCommands_;
+
+	ContextRequestedFunc_t	m_pContextRequestedFunc;
+	void*					m_pContextRequestedUserPtr;
+
+	ContextReleasedFunc_t	m_pContextReleasedFunc;
+	void*					m_pContextReleasedUserPtr;
 };
 
 /// Register Script library objects.
