@@ -449,6 +449,11 @@ const String& Object::GetCategory() const
     return String::EMPTY;
 }
 
+void Object::NotifyMe( int iFlags )
+{
+    context_->NotifyObject( this, iFlags );
+}
+
 EventHandler* Object::FindEventHandler(StringHash eventType, EventHandler** previous) const
 {
     EventHandler* handler = eventHandlers_.First();

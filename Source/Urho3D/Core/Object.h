@@ -161,9 +161,15 @@ public:
     /// Return object category. Categories are (optionally) registered along with the object factory. Return an empty string if the object category is not registered.
     const String& GetCategory() const;
 
+    void NotifyMe( int iFlags = 0 );
+
 protected:
     /// Execution context.
     Context* context_;
+
+protected:
+
+    virtual void onNotified( int iFlags ) {}
 
 private:
     /// Find the first event handler with no specific sender.

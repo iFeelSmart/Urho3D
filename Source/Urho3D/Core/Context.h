@@ -25,6 +25,7 @@
 #include "../Container/HashSet.h"
 #include "../Core/Attribute.h"
 #include "../Core/Object.h"
+#include "../Core/Mutex.h"
 
 namespace Urho3D
 {
@@ -197,6 +198,11 @@ public:
         return i != eventReceivers_.End() ? i->second_ : nullptr;
     }
 
+    /// Add object to notify
+    void NotifyObject( Object* object, int iFlags = 0 );
+
+    void processNotifications();
+
 private:
     /// Add event receiver.
     void AddEventReceiver(Object* receiver, StringHash eventType);
@@ -238,6 +244,9 @@ private:
     HashMap<String, Vector<StringHash> > objectCategories_;
     /// Variant map for global variables that can persist throughout application execution.
     VariantMap globalVars_;
+
+    Urho3D::Mutex                                           m_mutexObjectsToNotifify;
+    Urho3D::Vector< Pair< WeakPtr< Object >, int > >        m_vecObjectsToNotifify;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
