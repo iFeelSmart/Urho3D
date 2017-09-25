@@ -171,10 +171,14 @@ public:
     void SetBlockEvents(bool block) { blockEvents_ = block; }
     /// Return sending and receiving events blocking status.
     bool GetBlockEvents() const { return blockEvents_; }
-
+    
 protected:
     /// Execution context.
     Context* context_;
+
+protected:
+
+    virtual void onNotified( int iFlags ) {}
 
 private:
     /// Find the first event handler with no specific sender.

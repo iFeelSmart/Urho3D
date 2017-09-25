@@ -713,6 +713,8 @@ void Engine::Update()
     // Logic update event
     using namespace Update;
 
+    context_->processNotifications();
+
     VariantMap& eventData = GetEventDataMap();
     eventData[P_TIMESTEP] = timeStep_;
     SendEvent(E_UPDATE, eventData);
