@@ -24,8 +24,10 @@
 
 #ifdef URHO3D_IS_BUILDING
 #include "Urho3D.h"
+#include "../Core/Mutex.h"
 #else
 #include <Urho3D/Urho3D.h>
+#include <Urho3D/Core/Mutex.h>
 #endif
 
 namespace Urho3D
@@ -53,6 +55,8 @@ struct RefCount
     int refs_;
     /// Weak reference count.
     int weakRefs_;
+
+    Mutex mutex;
 };
 
 /// Base class for intrusively reference-counted objects. These are noncopyable and non-assignable.
@@ -83,7 +87,7 @@ private:
     RefCounted& operator =(const RefCounted& rhs);
 
     /// Pointer to the reference count structure.
-    RefCount* refCount_;
+    RefCount*   refCount_;
 };
 
 }

@@ -33,11 +33,18 @@ RefCounted::RefCounted() :
     refCount_(new RefCount())
 {
     // Hold a weak ref to self to avoid possible double delete of the refcount
+
+    refCount_->mutex.Acquire();
     (refCount_->weakRefs_)++;
+    refCount_->mutex.Release();
 }
 
 RefCounted::~RefCounted()
 {
+    volatile int iWeakRef;
+
+    refCount_->mutex.Acquire();
+
     assert(refCount_);
     assert(refCount_->refs_ == 0);
     assert(refCount_->weakRefs_ > 0);
@@ -45,35 +52,66 @@ RefCounted::~RefCounted()
     // Mark object as expired, release the self weak ref and delete the refcount if no other weak refs exist
     refCount_->refs_ = -1;
     (refCount_->weakRefs_)--;
-    if (!refCount_->weakRefs_)
+    iWeakRef = refCount_->weakRefs_;
+    if (!iWeakRef)
         delete refCount_;
+    else
+        refCount_->mutex.Release();
 
     refCount_ = nullptr;
 }
 
 void RefCounted::AddRef()
 {
+    refCount_->mutex.Acquire();
+
     assert(refCount_->refs_ >= 0);
+
     (refCount_->refs_)++;
+
+    refCount_->mutex.Release();
 }
 
 void RefCounted::ReleaseRef()
 {
+    volatile int iRefAfterDecr;
+
+    refCount_->mutex.Acquire();
+
     assert(refCount_->refs_ > 0);
     (refCount_->refs_)--;
-    if (!refCount_->refs_)
+    iRefAfterDecr = refCount_->refs_;
+    if (!iRefAfterDecr)
         delete this;
+    else
+        refCount_->mutex.Release();
 }
 
 int RefCounted::Refs() const
 {
-    return refCount_->refs_;
+    volatile int iCount;
+
+    refCount_->mutex.Acquire();
+
+    iCount = refCount_->refs_;
+
+    refCount_->mutex.Release();
+
+    return iCount;
 }
 
 int RefCounted::WeakRefs() const
 {
+    volatile int iCount;
+
     // Subtract one to not return the internally held reference
-    return refCount_->weakRefs_ - 1;
+    refCount_->mutex.Acquire();
+
+    iCount = refCount_->weakRefs_ - 1;
+
+    refCount_->mutex.Release();
+
+    return iCount;
 }
 
 }
