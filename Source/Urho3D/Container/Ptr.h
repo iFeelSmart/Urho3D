@@ -156,9 +156,13 @@ public:
         if (ptr_)
         {
             RefCount* refCount = RefCountPtr();
+            refCount->mutex.Acquire();
             ++refCount->refs_; // 2 refs
+            refCount->mutex.Release();
             Reset(); // 1 ref
+            refCount->mutex.Acquire();
             --refCount->refs_; // 0 refs
+            refCount->mutex.Release();
         }
         return ptr;
     }
@@ -442,7 +446,20 @@ public:
     bool NotNull() const { return refCount_ != 0; }
 
     /// Return the object's reference count, or 0 if null pointer or if object has expired.
-    int Refs() const { return (refCount_ && refCount_->refs_ >= 0) ? refCount_->refs_ : 0; }
+    int Refs() const
+    {
+        volatile int iCount = 0;
+
+        if( refCount_ )
+        {
+            refCount_->mutex.Acquire();
+            if( refCount_->refs_ >= 0 )
+                iCount = refCount_->refs_;
+            refCount_->mutex.Release();
+        }
+
+        return iCount;
+    }
 
     /// Return the object's weak reference count.
     int WeakRefs() const
@@ -450,11 +467,31 @@ public:
         if (!Expired())
             return ptr_->WeakRefs();
         else
-            return refCount_ ? refCount_->weakRefs_ : 0;
+        {
+            int iCount = 0;
+            if( refCount_ )
+            {
+                refCount_->mutex.Acquire();
+                iCount = refCount_->weakRefs_;
+                refCount_->mutex.Release();
+            }
+            return iCount;
+        }
     }
 
     /// Return whether the object has expired. If null pointer, always return true.
-    bool Expired() const { return refCount_ ? refCount_->refs_ < 0 : true; }
+    bool Expired() const
+    {
+        bool bExpired = true;
+
+        if( refCount_ )
+        {
+            refCount_->mutex.Acquire();
+            bExpired = refCount_->refs_ < 0;
+            refCount_->mutex.Release();
+        }
+        return bExpired;
+    }
 
     /// Return pointer to the RefCount structure.
     RefCount* RefCountPtr() const { return refCount_; }
@@ -470,8 +507,10 @@ private:
     {
         if (refCount_)
         {
+            refCount_->mutex.Acquire();
             assert(refCount_->weakRefs_ >= 0);
             ++(refCount_->weakRefs_);
+            refCount_->mutex.Release();
         }
     }
 
@@ -480,11 +519,17 @@ private:
     {
         if (refCount_)
         {
+            refCount_->mutex.Acquire();
+
             assert(refCount_->weakRefs_ > 0);
             --(refCount_->weakRefs_);
 
-            if (Expired() && !refCount_->weakRefs_)
+            bool bDelete = refCount_->refs_ < 0 && !refCount_->weakRefs_;
+
+            if( bDelete )
                 delete refCount_;
+            else
+                refCount_->mutex.Release();
         }
 
         ptr_ = 0;
