@@ -34,38 +34,38 @@ class JSONValue;
 /// Interpolation method.
 enum InterpMethod
 {
-    /// No interpolation.
-    IM_NONE = 0,
-    /// Linear interpolation (default).
-    IM_LINEAR,
-    /// Cardinal spline interpolation, default tension value is 0.5f. For more information please refer to http://cubic.org/docs/hermite.htm.
-    IM_SPLINE,
+	/// No interpolation.
+	IM_NONE = 0,
+	/// Linear interpolation (default).
+	IM_LINEAR,
+	/// Cardinal spline interpolation, default tension value is 0.5f. For more information please refer to http://cubic.org/docs/hermite.htm.
+	IM_SPLINE,
 };
 
 /// Value animation key frame.
 struct VAnimKeyFrame
 {
-    /// Time.
-    float time_;
-    /// Value.
-    Variant value_;
+	/// Time.
+	float time_;
+	/// Value.
+	Variant value_;
 };
 
 /// Value animation event frame.
 struct VAnimEventFrame
 {
-    /// Time.
-    float time_;
-    /// Event type.
-    StringHash eventType_;
-    /// Event data.
-    VariantMap eventData_;
+	/// Time.
+	float time_;
+	/// Event type.
+	StringHash eventType_;
+	/// Event data.
+	VariantMap eventData_;
 };
 
 /// Value animation class.
 class URHO3D_API ValueAnimation : public Resource
 {
-    URHO3D_OBJECT(ValueAnimation, Resource);
+	URHO3D_OBJECT(ValueAnimation, Resource);
 
 public:
     /// Construct.
@@ -97,6 +97,8 @@ public:
     /// Set value type.
     void SetValueType(VariantType valueType);
 
+	/// Clear all keys
+	void ClearKeyFrames();
     /// Set key frame.
     bool SetKeyFrame(float time, const Variant& value);
     /// Set event frame.
