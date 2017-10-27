@@ -525,14 +525,14 @@ String String::Trimmed() const
     while (trimStart < trimEnd)
     {
         char c = buffer_[trimStart];
-        if (c != ' ' && c != 9)
+        if (c != ' ' && c != 9 && c != '\r' && c!= '\n')
             break;
         ++trimStart;
     }
     while (trimEnd > trimStart)
     {
         char c = buffer_[trimEnd - 1];
-        if (c != ' ' && c != 9)
+        if (c != ' ' && c != 9 && c != '\r' && c!= '\n')
             break;
         --trimEnd;
     }
@@ -1013,9 +1013,9 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
 {
     if (src == nullptr)
         return 0;
-    
+
     unsigned short word1 = *src++;
-    
+
     // Check if we are at a low surrogate
     if (word1 >= 0xdc00 && word1 < 0xe000)
     {
@@ -1023,7 +1023,7 @@ unsigned String::DecodeUTF16(const wchar_t*& src)
             ++src;
         return '?';
     }
-    
+
     if (word1 < 0xd800 || word1 >= 0xe000)
         return word1;
     else
@@ -1059,7 +1059,7 @@ Vector<String> String::Split(const char* str, char separator, bool keepEmptyStri
     const ptrdiff_t splitLen = strEnd - str;
     if (splitLen > 0 || keepEmptyStrings)
         ret.Push(String(str, splitLen));
-    
+
     return ret;
 }
 
@@ -1247,7 +1247,7 @@ WString::WString(const String& str) :
 #ifdef _WIN32
     unsigned neededSize = 0;
     wchar_t temp[3];
-    
+
     unsigned byteOffset = 0;
     while (byteOffset < str.Length())
     {
@@ -1255,9 +1255,9 @@ WString::WString(const String& str) :
         String::EncodeUTF16(dest, str.NextUTF8Char(byteOffset));
         neededSize += dest - temp;
     }
-    
+
     Resize(neededSize);
-    
+
     byteOffset = 0;
     wchar_t* dest = buffer_;
     while (byteOffset < str.Length())
