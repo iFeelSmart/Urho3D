@@ -532,6 +532,47 @@ bool FileSystem::Delete(const String& fileName)
 #endif
 }
 
+bool FileSystem::DeleteDir(const String& dirName, bool recursive)
+{
+    if (!CheckAccess(GetPath(dirName)))
+    {
+        URHO3D_LOGERROR("Access denied to " + dirName);
+        return false;
+    }
+
+    if( recursive )
+    {
+        Vector<String> files;
+        ScanDir( files, dirName, "", SCAN_DIRS | SCAN_FILES | SCAN_HIDDEN, false );
+
+        // Delete files
+        for( unsigned f = 0; f < files.Size(); ++f )
+        {
+            String file = AddTrailingSlash( dirName ) + files[ f ];
+
+            if( FileExists( file ) )
+                Delete( file );
+        }
+
+        // Delete Dirs
+        for( unsigned f = 0; f < files.Size(); ++f )
+        {
+            if( files[ f ] == "." || files[ f ] == ".." || files[ f ].EndsWith( "/." ) || files[ f ].EndsWith( "/.." ) )
+                continue;
+
+            String dir = AddTrailingSlash( dirName ) + files[ f ];
+            if( DirExists( dir ) )
+                DeleteDir( dir, true );
+        }
+    }
+
+#ifdef _WIN32
+    return RemoveDirectoryW( GetWideNativePath(dirName).CString() ) != 0;
+#else
+    return rmdir( GetNativePath(dirName).CString() ) == 0;
+#endif
+}
+
 String FileSystem::GetCurrentDir() const
 {
 #ifdef _WIN32
@@ -1088,6 +1129,15 @@ String FileSystem::GetTemporaryDir() const
     return "/tmp/";
 #endif
 #endif
+}
+
+String GetRelativeFileName(const String& dirName, const String& fileName)
+{
+    String dn = RemoveTrailingSlash( dirName );
+    if( fileName.StartsWith( dn ) )
+        return fileName.Substring( dn.Length() + 1 );
+    else
+        return fileName;
 }
 
 }

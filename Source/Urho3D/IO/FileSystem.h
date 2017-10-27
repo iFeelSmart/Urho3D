@@ -41,7 +41,7 @@ static const unsigned SCAN_HIDDEN = 0x4;
 /// Subsystem for file and directory operations and access control.
 class URHO3D_API FileSystem : public Object
 {
-    URHO3D_OBJECT(FileSystem, Object);
+	URHO3D_OBJECT(FileSystem, Object);
 
 public:
     /// Construct.
@@ -125,9 +125,11 @@ private:
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.
 URHO3D_API void
-    SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
+	SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
 /// Return the path from a full path.
 URHO3D_API String GetPath(const String& fullPath);
+/// Return the relative filename from the directory name.
+URHO3D_API String GetRelativeFileName(const String& dirName, const String& fileName);
 /// Return the filename from a full path.
 URHO3D_API String GetFileName(const String& fullPath);
 /// Return the extension from a full path, converted to lowercase by default.
