@@ -120,16 +120,22 @@ void RemoveNamedAttribute(HashMap<StringHash, Vector<AttributeInfo> >& attribute
         attributes.Erase(i);
 }
 
-Context::Context() :
+Context::Context(bool temporary) :
     eventHandler_(nullptr)
 {
 #ifdef __ANDROID__
-    // Always reset the random seed on Android, as the Urho3D library might not be unloaded between runs
-    SetRandomSeed(1);
+    if( !temporary )
+    {
+        // Always reset the random seed on Android, as the Urho3D library might not be unloaded between runs
+        SetRandomSeed(1);
+    }
 #endif
 
-    // Set the main thread ID (assuming the Context is created in it)
-    Thread::SetMainThread();
+    if( !temporary )
+    {
+        // Set the main thread ID (assuming the Context is created in it)
+        Thread::SetMainThread();
+    }
 }
 
 Context::~Context()
@@ -475,18 +481,18 @@ void Context::EndSendEvent()
 
 void Context::NotifyObject( Object* object, int iFlags )
 {
-    m_mutexObjectsToNotifify.Acquire();
-    m_vecObjectsToNotifify.Push( Pair< WeakPtr< Object >, int >( WeakPtr< Object >( object ), iFlags ) );
-    m_mutexObjectsToNotifify.Release();
+    m_mutexObjectsToNotify.Acquire();
+    m_vecObjectsToNotify.Push( Pair< WeakPtr< Object >, int >( WeakPtr< Object >( object ), iFlags ) );
+    m_mutexObjectsToNotify.Release();
 }
 
 void Context::processNotifications()
 {
     Urho3D::Vector< Pair< WeakPtr< Object >, int > > objectsToNotifify;
-    m_mutexObjectsToNotifify.Acquire();
-    objectsToNotifify = m_vecObjectsToNotifify;
-    m_vecObjectsToNotifify.Clear();
-    m_mutexObjectsToNotifify.Release();
+    m_mutexObjectsToNotify.Acquire();
+    objectsToNotifify = m_vecObjectsToNotify;
+    m_vecObjectsToNotify.Clear();
+    m_mutexObjectsToNotify.Release();
 
     for( Pair< WeakPtr< Object >, int >& object : objectsToNotifify )
     {

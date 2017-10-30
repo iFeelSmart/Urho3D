@@ -70,7 +70,7 @@ class URHO3D_API Context : public RefCounted
 
 public:
     /// Construct.
-    Context();
+    Context(bool temporary = false);
     /// Destruct.
     virtual ~Context() override;
 
@@ -245,8 +245,8 @@ private:
     /// Variant map for global variables that can persist throughout application execution.
     VariantMap globalVars_;
 
-    Urho3D::Mutex                                           m_mutexObjectsToNotifify;
-    Urho3D::Vector< Pair< WeakPtr< Object >, int > >        m_vecObjectsToNotifify;
+    Urho3D::Mutex                                           m_mutexObjectsToNotify;
+    Urho3D::Vector< Pair< WeakPtr< Object >, int > >        m_vecObjectsToNotify;
 };
 
 template <class T> void Context::RegisterFactory() { RegisterFactory(new ObjectFactoryImpl<T>(this)); }
