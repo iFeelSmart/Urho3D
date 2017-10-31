@@ -72,7 +72,7 @@ struct StoredLogMessage
 /// Logging subsystem.
 class URHO3D_API Log : public Object
 {
-    URHO3D_OBJECT(Log, Object);
+	URHO3D_OBJECT(Log, Object);
 
 public:
     /// Construct.
@@ -90,6 +90,7 @@ public:
     void SetTimeStamp(bool enable);
     /// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
     void SetQuiet(bool quiet);
+	void SetWriteInConsole(bool write);
 
     /// Return logging level.
     int GetLevel() const { return level_; }
@@ -109,25 +110,27 @@ public:
     static void WriteRaw(const String& message, bool error = false);
 
 private:
-    /// Handle end of frame. Process the threaded log messages.
-    void HandleEndFrame(StringHash eventType, VariantMap& eventData);
+	/// Handle end of frame. Process the threaded log messages.
+	void HandleEndFrame(StringHash eventType, VariantMap& eventData);
 
-    /// Mutex for threaded operation.
-    Mutex logMutex_;
-    /// Log messages from other threads.
-    List<StoredLogMessage> threadMessages_;
-    /// Log file.
-    SharedPtr<File> logFile_;
-    /// Last log message.
-    String lastMessage_;
-    /// Logging level.
-    int level_;
-    /// Timestamp log messages flag.
-    bool timeStamp_;
-    /// In write flag to prevent recursion.
-    bool inWrite_;
-    /// Quiet mode flag.
-    bool quiet_;
+	/// Mutex for threaded operation.
+	Mutex logMutex_;
+	/// Log messages from other threads.
+	List<StoredLogMessage> threadMessages_;
+	/// Log file.
+	SharedPtr<File> logFile_;
+	/// Last log message.
+	String lastMessage_;
+	/// Logging level.
+	int level_;
+	/// Timestamp log messages flag.
+	bool timeStamp_;
+	/// In write flag to prevent recursion.
+	bool inWrite_;
+	/// Quiet mode flag.
+	bool quiet_;
+	/// Write in console
+	bool writeInConsole_;
 };
 
 #ifdef URHO3D_LOGGING
