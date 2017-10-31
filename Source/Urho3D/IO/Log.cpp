@@ -66,7 +66,8 @@ Log::Log(Context* context) :
 #endif
     timeStamp_(true),
     inWrite_(false),
-    quiet_(false)
+    quiet_(false),
+    writeInConsole_(false)
 {
     logInstance = this;
 
@@ -134,6 +135,11 @@ void Log::SetQuiet(bool quiet)
     quiet_ = quiet;
 }
 
+void Urho3D::Log::SetWriteInConsole(bool write)
+{
+    writeInConsole_ = write;
+}
+
 void Log::Write(int level, const String& message)
 {
     // Special case for LOG_RAW level
@@ -176,14 +182,17 @@ void Log::Write(int level, const String& message)
 #elif defined(IOS) || defined(TVOS)
     SDL_IOS_LogMessage(message.CString());
 #else
-    if (logInstance->quiet_)
+    if( logInstance->writeInConsole_ )
     {
-        // If in quiet mode, still print the error message to the standard error stream
-        if (level == LOG_ERROR)
-            PrintUnicodeLine(formattedMessage, true);
+        if (logInstance->quiet_)
+        {
+            // If in quiet mode, still print the error message to the standard error stream
+            if (level == LOG_ERROR)
+                PrintUnicodeLine(formattedMessage, true);
+        }
+        else
+            PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
     }
-    else
-        PrintUnicodeLine(formattedMessage, level == LOG_ERROR);
 #endif
 
     if (logInstance->logFile_)

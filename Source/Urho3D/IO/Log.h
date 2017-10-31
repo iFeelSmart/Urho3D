@@ -48,86 +48,89 @@ class File;
 /// Stored log message from another thread.
 struct StoredLogMessage
 {
-    /// Construct undefined.
-    StoredLogMessage()
-    {
-    }
+	/// Construct undefined.
+	StoredLogMessage()
+	{
+	}
 
-    /// Construct with parameters.
-    StoredLogMessage(const String& message, int level, bool error) :
-        message_(message),
-        level_(level),
-        error_(error)
-    {
-    }
+	/// Construct with parameters.
+	StoredLogMessage(const String& message, int level, bool error) :
+		message_(message),
+		level_(level),
+		error_(error)
+	{
+	}
 
-    /// Message text.
-    String message_;
-    /// Message level. -1 for raw messages.
-    int level_;
-    /// Error flag for raw messages.
-    bool error_;
+	/// Message text.
+	String message_;
+	/// Message level. -1 for raw messages.
+	int level_;
+	/// Error flag for raw messages.
+	bool error_;
 };
 
 /// Logging subsystem.
 class URHO3D_API Log : public Object
 {
-    URHO3D_OBJECT(Log, Object);
+	URHO3D_OBJECT(Log, Object);
 
 public:
-    /// Construct.
-    Log(Context* context);
-    /// Destruct. Close the log file if open.
-    virtual ~Log() override;
+	/// Construct.
+	Log(Context* context);
+	/// Destruct. Close the log file if open.
+	virtual ~Log() override;
 
-    /// Open the log file.
-    void Open(const String& fileName);
-    /// Close the log file.
-    void Close();
-    /// Set logging level.
-    void SetLevel(int level);
-    /// Set whether to timestamp log messages.
-    void SetTimeStamp(bool enable);
-    /// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
-    void SetQuiet(bool quiet);
+	/// Open the log file.
+	void Open(const String& fileName);
+	/// Close the log file.
+	void Close();
+	/// Set logging level.
+	void SetLevel(int level);
+	/// Set whether to timestamp log messages.
+	void SetTimeStamp(bool enable);
+	/// Set quiet mode ie. only print error entries to standard error stream (which is normally redirected to console also). Output to log file is not affected by this mode.
+	void SetQuiet(bool quiet);
+	void SetWriteInConsole(bool write);
 
-    /// Return logging level.
-    int GetLevel() const { return level_; }
+	/// Return logging level.
+	int GetLevel() const { return level_; }
 
-    /// Return whether log messages are timestamped.
-    bool GetTimeStamp() const { return timeStamp_; }
+	/// Return whether log messages are timestamped.
+	bool GetTimeStamp() const { return timeStamp_; }
 
-    /// Return last log message.
-    String GetLastMessage() const { return lastMessage_; }
+	/// Return last log message.
+	String GetLastMessage() const { return lastMessage_; }
 
-    /// Return whether log is in quiet mode (only errors printed to standard error stream).
-    bool IsQuiet() const { return quiet_; }
+	/// Return whether log is in quiet mode (only errors printed to standard error stream).
+	bool IsQuiet() const { return quiet_; }
 
-    /// Write to the log. If logging level is higher than the level of the message, the message is ignored.
-    static void Write(int level, const String& message);
-    /// Write raw output to the log.
-    static void WriteRaw(const String& message, bool error = false);
+	/// Write to the log. If logging level is higher than the level of the message, the message is ignored.
+	static void Write(int level, const String& message);
+	/// Write raw output to the log.
+	static void WriteRaw(const String& message, bool error = false);
 
 private:
-    /// Handle end of frame. Process the threaded log messages.
-    void HandleEndFrame(StringHash eventType, VariantMap& eventData);
+	/// Handle end of frame. Process the threaded log messages.
+	void HandleEndFrame(StringHash eventType, VariantMap& eventData);
 
-    /// Mutex for threaded operation.
-    Mutex logMutex_;
-    /// Log messages from other threads.
-    List<StoredLogMessage> threadMessages_;
-    /// Log file.
-    SharedPtr<File> logFile_;
-    /// Last log message.
-    String lastMessage_;
-    /// Logging level.
-    int level_;
-    /// Timestamp log messages flag.
-    bool timeStamp_;
-    /// In write flag to prevent recursion.
-    bool inWrite_;
-    /// Quiet mode flag.
-    bool quiet_;
+	/// Mutex for threaded operation.
+	Mutex logMutex_;
+	/// Log messages from other threads.
+	List<StoredLogMessage> threadMessages_;
+	/// Log file.
+	SharedPtr<File> logFile_;
+	/// Last log message.
+	String lastMessage_;
+	/// Logging level.
+	int level_;
+	/// Timestamp log messages flag.
+	bool timeStamp_;
+	/// In write flag to prevent recursion.
+	bool inWrite_;
+	/// Quiet mode flag.
+	bool quiet_;
+	/// Write in console
+	bool writeInConsole_;
 };
 
 #ifdef URHO3D_LOGGING
