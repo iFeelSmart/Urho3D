@@ -29,16 +29,9 @@
 
 namespace Urho3D
 {
-
-unsigned GraphicsImpl::getDefaultSystemFBO( void* pImpl )
-{
-    return ((GraphicsImpl*)pImpl)->systemFBO_;
-}
-
 GraphicsImpl::GraphicsImpl() :
     externalContext_(false),
     context_(nullptr),
-    getSystemFBOFunc( getDefaultSystemFBO ),
     systemFBO_(0),
     activeTexture_(0),
     enabledVertexAttributes_(0),
