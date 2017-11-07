@@ -70,7 +70,6 @@ namespace Urho3D
 {
 
 class Context;
-
 using ConstantBufferMap = HashMap<unsigned, SharedPtr<ConstantBuffer> >;
 using ShaderProgramMap = HashMap<Pair<ShaderVariation*, ShaderVariation*>, SharedPtr<ShaderProgram> >;
 
@@ -102,13 +101,12 @@ public:
     const SDL_GLContext& GetGLContext() { return context_; }
     void                 SetGLContext( const SDL_GLContext& context )            { context_ = context; externalContext_ = true; }
 
+    unsigned             GetSystemFBO() { return systemFBO_; }
+
 private:
-    typedef unsigned (*getSystemFBOFunctionPtr)( void* );
-    static unsigned getDefaultSystemFBO( void* pImpl );
 
     /// SDL OpenGL context.
     SDL_GLContext context_{};
-
     /// iOS/tvOS system framebuffer handle.
     unsigned systemFBO_{};
     /// Active texture unit.

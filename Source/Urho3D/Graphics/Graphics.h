@@ -77,6 +77,14 @@ struct ScratchBuffer
     bool reserved_;
 };
 
+class GraphicsContextGetter : public RefCounted
+{
+    public:
+
+        virtual ~GraphicsContextGetter() {}
+        virtual unsigned getGLFBO( void* pImpl ) = 0;
+};
+
 /// %Graphics subsystem. Manages the application window, rendering state and GPU resources.
 class URHO3D_API Graphics : public Object
 {
@@ -84,13 +92,17 @@ class URHO3D_API Graphics : public Object
 
 public:
     /// Construct.
+<<<<<<< HEAD
     explicit Graphics(Context* context, bool bUseExternalGLContext = false);
 
+=======
+    Graphics( Context* context, bool bUseExternalGLContext );
+>>>>>>> Replace get FBO function pointer by an instanced class
     /// Destruct. Release the Direct3D11 device and close the window.
     ~Graphics() override;
 
     void SetSize( int width, int height );
-    void SetGetSystemFBOFunc( void* pFunc );
+    void SetGraphicsContextGetter( GraphicsContextGetter* pGetter ) { graphicsContextGetter = pGetter; }
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);
@@ -798,6 +810,8 @@ private:
     String orientations_;
     /// Graphics API name.
     String apiName_;
+
+    SharedPtr<GraphicsContextGetter> graphicsContextGetter;
 
     /// Pixel perfect UV offset.
     static const Vector2 pixelUVOffset;

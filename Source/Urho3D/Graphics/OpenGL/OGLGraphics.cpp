@@ -220,8 +220,18 @@ static void GetGLPrimitiveType(unsigned elementCount, PrimitiveType type, unsign
 const Vector2 Graphics::pixelUVOffset(0.0f, 0.0f);
 bool Graphics::gl3Support = false;
 
-Graphics::Graphics(Context* context, bool bUseExternalGLContext) :
-    Object(context),
+class GraphicsContextGetterGL : public GraphicsContextGetter
+{
+    public:
+
+        virtual unsigned getGLFBO( void* pImpl )
+        {
+            return ( (GraphicsImpl*)pImpl )->GetSystemFBO();
+        }
+};
+
+Graphics::Graphics( Context* context_, bool bUseExternalGLContext ) :
+    Object(context_),
     impl_(new GraphicsImpl()),
     position_(SDL_WINDOWPOS_UNDEFINED, SDL_WINDOWPOS_UNDEFINED),
     shadowMapFormat_(GL_DEPTH_COMPONENT16),
@@ -235,6 +245,8 @@ Graphics::Graphics(Context* context, bool bUseExternalGLContext) :
     apiName_("GLES2")
 #endif
 {
+    SetGraphicsContextGetter( new GraphicsContextGetterGL() );
+
     SetTextureUnitMappings();
     ResetCachedState();
 
@@ -276,11 +288,6 @@ void Graphics::SetSize( int width, int height )
     eventData[P_RESIZABLE] = resizable_;
     eventData[P_BORDERLESS] = borderless_;
     SendEvent(E_SCREENMODE, eventData);
-}
-
-void Graphics::SetGetSystemFBOFunc( void* pFunc )
-{
-    impl_->getSystemFBOFunc = (GraphicsImpl::getSystemFBOFunctionPtr)pFunc;
 }
 
 bool Graphics::SetMode( int width, int height, int multisample, void* glContext, unsigned int iDefaultFrameBuffer )
@@ -2956,7 +2963,7 @@ void Graphics::PrepareDraw()
 
         if (noFbo)
         {
-            unsigned currentSystemFBO_ = impl_->getSystemFBOFunc( impl_ );
+            unsigned currentSystemFBO_ = graphicsContextGetter->getGLFBO( impl_ );
             if (impl_->boundFBO_ != currentSystemFBO_)
             {
                 BindFramebuffer(currentSystemFBO_);
@@ -3242,7 +3249,7 @@ void Graphics::CleanupFramebuffers()
 {
     if (!IsDeviceLost())
     {
-        unsigned currentSystemFBO_ = impl_->getSystemFBOFunc( impl_ );
+        unsigned currentSystemFBO_ = graphicsContextGetter->getGLFBO( impl_ );
 
         BindFramebuffer(currentSystemFBO_);
         impl_->boundFBO_ = currentSystemFBO_;
@@ -3312,7 +3319,7 @@ void Graphics::ResetCachedState()
     impl_->enabledVertexAttributes_ = 0;
     impl_->usedVertexAttributes_ = 0;
     impl_->instancingVertexAttributes_ = 0;
-    impl_->boundFBO_ = impl_->getSystemFBOFunc( impl_ );
+    impl_->boundFBO_ = graphicsContextGetter->getGLFBO( impl_ );
     impl_->boundVBO_ = 0;
     impl_->boundUBO_ = 0;
     impl_->sRGBWrite_ = false;
