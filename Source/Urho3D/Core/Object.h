@@ -176,10 +176,6 @@ protected:
     /// Execution context.
     Context* context_;
 
-protected:
-
-    virtual void onNotified( int iFlags ) {}
-
 private:
     /// Find the first event handler with no specific sender.
     EventHandler* FindEventHandler(StringHash eventType, EventHandler** previous = nullptr) const;
