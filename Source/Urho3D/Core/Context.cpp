@@ -479,26 +479,4 @@ void Context::EndSendEvent()
 #endif
 }
 
-void Context::NotifyObject( Object* object, int iFlags )
-{
-    m_mutexObjectsToNotify.Acquire();
-    m_vecObjectsToNotify.Push( Pair< WeakPtr< Object >, int >( WeakPtr< Object >( object ), iFlags ) );
-    m_mutexObjectsToNotify.Release();
-}
-
-void Context::processNotifications()
-{
-    Urho3D::Vector< Pair< WeakPtr< Object >, int > > objectsToNotifify;
-    m_mutexObjectsToNotify.Acquire();
-    objectsToNotifify = m_vecObjectsToNotify;
-    m_vecObjectsToNotify.Clear();
-    m_mutexObjectsToNotify.Release();
-
-    for( Pair< WeakPtr< Object >, int >& object : objectsToNotifify )
-    {
-        if( object.first_ )
-            object.first_->onNotified( object.second_ );
-    }
-}
-
 }
