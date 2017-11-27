@@ -62,3 +62,4 @@ setup_library ()
 
 # Install headers for building and using the Urho3D library (install dependency for Urho3D/Script/APITemplates.h)
 install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/AngelScript FILES_MATCHING PATTERN *.h)     # Note: the trailing slash is significant
+install_header_files (DIRECTORY source/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/AngelScript/private FILES_MATCHING PATTERN *.h) 
