@@ -230,6 +230,16 @@ class GraphicsContextGetterGL : public GraphicsContextGetter
         }
 };
 
+void Graphics::SetGLContext( void* pContext )
+{
+    impl_->SetGLContext( pContext );
+}
+
+void Graphics::BindGLContext()
+{
+    SDL_GL_MakeCurrent( window_, impl_->GetGLContext() );
+}
+
 Graphics::Graphics( Context* context_, bool bUseExternalGLContext ) :
     Object(context_),
     impl_(new GraphicsImpl()),
@@ -520,7 +530,9 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
             {
 #ifndef __EMSCRIPTEN__
                 if (!window_)
-                    window_ = SDL_CreateWindowFrom(externalWindow_, SDL_WINDOW_OPENGL);
+                {
+                    window_ = SDL_CreateWindowFrom(externalWindow_, flags);
+                }
                 fullscreen = false;
 #endif
             }
@@ -711,14 +723,14 @@ bool Graphics::BeginFrame()
         return false;
 
     // If using an external window, check it for size changes, and reset screen mode if necessary
-    if (externalWindow_)
-    {
-        int width, height;
+//    if (externalWindow_)
+//    {
+//        int width, height;
 
-        SDL_GL_GetDrawableSize(window_, &width, &height);
-        if (width != width_ || height != height_)
-            SetMode(width, height);
-    }
+//        SDL_GetWindowSize( window_, &width, &height );
+//        if (width != width_ || height != height_)
+//            SetMode(width, height);
+//    }
 
     // Re-enable depth test and depth func in case a third party program has modified it
     glEnable(GL_DEPTH_TEST);
