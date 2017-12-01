@@ -97,7 +97,9 @@ public:
     virtual ~Graphics();
 
     void SetSize( int width, int height );
+    void SetGLContext( void* pContext );
     void SetGraphicsContextGetter( GraphicsContextGetter* pGetter ) { graphicsContextGetter = pGetter; }
+    void BindGLContext();
 
     /// Set external window handle. Only effective before setting the initial screen mode.
     void SetExternalWindow(void* window);
