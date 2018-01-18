@@ -69,11 +69,24 @@ template <> inline unsigned MakeHash(const unsigned long long& value)
     return (unsigned)((value >> 32u) | (value & 0xffffffffu));
 }
 
+/// Unsigned long int hash function.
+template <> inline unsigned MakeHash(const unsigned long int& value)
+{
+    return (unsigned)(value);
+}
+
 /// Int hash function.
 template <> inline unsigned MakeHash(const int& value)
 {
     return (unsigned)value;
 }
+
+/// Int hash function.
+template <> inline unsigned MakeHash(const long& value)
+{
+    return (unsigned)value;
+}
+
 
 /// Unsigned hash function.
 template <> inline unsigned MakeHash(const unsigned& value)
