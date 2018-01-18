@@ -25,6 +25,7 @@ set (TARGET_NAME sqlite)
 
 # Define preprocessor macros
 add_definitions (-DSQLITE_USE_URI=1 -DSQLITE_ENABLE_COLUMN_METADATA -DSQLITE_SOUNDEX)   # https://www.sqlite.org/compile.html
+add_definitions (-DSQLITE_THREADSAFE=2)
 if (WEB)
     # Do not use pthread and dl libraries for Web platform
     add_definitions (-DSQLITE_THREADSAFE=0 -DSQLITE_OMIT_LOAD_EXTENSION)
