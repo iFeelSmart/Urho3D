@@ -100,6 +100,19 @@ public:
     }
 
     /// Insert an element at the end.
+    void InsertAfter(T* element, T* relativeElement)
+    {
+        if(!relativeElement)
+            Insert(element);
+        else
+        {
+            LinkedListNode* previousRelativeNext = relativeElement->next_;
+            relativeElement->next_ = element;
+            element->next_ = previousRelativeNext;
+        }
+    }
+
+    /// Insert an element at the end.
     void Insert(T* element)
     {
         if (head_)
