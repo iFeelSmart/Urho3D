@@ -87,6 +87,7 @@ public:
             element = next;
         }
         head_ = nullptr;
+        
     }
 
     /// Insert an element at the beginning.
