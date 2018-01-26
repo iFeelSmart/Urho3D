@@ -78,6 +78,8 @@ public:
             delete element;
             element = next;
         }
+
+        head_ = 0;
     }
 
     /// Insert an element at the beginning.
