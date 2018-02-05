@@ -364,7 +364,7 @@ bool Graphics::SetMode( int width, int height, int multisample, void* glContext,
 }
 
 bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync,
-    bool tripleBuffer, int multiSample, int monitor, int refreshRate)
+    bool tripleBuffer, int multiSample, int monitor, int refreshRate, int redSize, int greenSize, int blueSize, int alphaSize, int depthBufferSize, int stencilSize)
 {
     URHO3D_PROFILE(SetScreenMode);
 
@@ -463,18 +463,6 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
 #ifndef GL_ES_VERSION_2_0
-        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
-        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, 8);
-
-        if (externalWindow_)
-            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 8);
-        else
-            SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, 0);
-
-        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
         if (!forceGL2_)
         {
             SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
@@ -491,6 +479,13 @@ bool Graphics::SetMode(int width, int height, bool fullscreen, bool borderless, 
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
         SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
 #endif
+
+        SDL_GL_SetAttribute(SDL_GL_RED_SIZE, redSize);
+        SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, greenSize);
+        SDL_GL_SetAttribute(SDL_GL_BLUE_SIZE, blueSize);
+        SDL_GL_SetAttribute(SDL_GL_ALPHA_SIZE, alphaSize);
+        SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, depthBufferSize);
+        SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, stencilSize);
 
         if (multiSample > 1)
         {
