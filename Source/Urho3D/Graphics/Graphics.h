@@ -91,6 +91,7 @@ class URHO3D_API Graphics : public Object
     URHO3D_OBJECT(Graphics, Object);
 
 public:
+
     /// Construct.
     Graphics( Context* context, bool bUseExternalGLContext );
     /// Destruct. Release the Direct3D11 device and close the window.
@@ -115,7 +116,7 @@ public:
     bool SetMode(int width, int height, int multisample, void* glContext, unsigned int iDefaultFrameBuffer );
     bool SetMode
         (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,
-            int multiSample, int monitor, int refreshRate);
+            int multiSample, int monitor, int refreshRate, int redSize = 8, int greenSize = 8, int blueSize = 8, int alphaSize = 0, int depthBufferSize = 24, int stencilSize = 8 );
     /// Set screen resolution only. Return true if successful.
     bool SetMode(int width, int height);
     /// Set whether the main window uses sRGB conversion on write.

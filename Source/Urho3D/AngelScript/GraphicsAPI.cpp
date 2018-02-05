@@ -1874,7 +1874,7 @@ static Graphics* GetGraphics()
 static void RegisterGraphics(asIScriptEngine* engine)
 {
     RegisterObject<Graphics>(engine, "Graphics");
-    engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int)", asMETHODPR(Graphics, SetMode, (int, int, bool, bool, bool, bool, bool, bool, int, int, int), bool), asCALL_THISCALL);
+    engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int, bool, bool, bool, bool, bool, bool, int, int, int, int, int, int, int, int, int)", asMETHODPR(Graphics, SetMode, (int, int, bool, bool, bool, bool, bool, bool, int, int, int, int, int, int, int, int, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool SetMode(int, int)", asMETHODPR(Graphics, SetMode, (int, int), bool), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "void SetWindowPosition(int, int)", asMETHODPR(Graphics, SetWindowPosition, (int, int), void), asCALL_THISCALL);
     engine->RegisterObjectMethod("Graphics", "bool ToggleFullscreen()", asMETHOD(Graphics, ToggleFullscreen), asCALL_THISCALL);

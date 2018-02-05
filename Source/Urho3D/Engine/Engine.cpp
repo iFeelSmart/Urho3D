@@ -271,7 +271,13 @@ bool Engine::Initialize(const VariantMap& parameters)
                 GetParameter(parameters, EP_TRIPLE_BUFFER, false).GetBool(),
                 GetParameter(parameters, EP_MULTI_SAMPLE, 1).GetInt(),
                 GetParameter(parameters, EP_MONITOR, 0).GetInt(),
-                GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt()
+                GetParameter(parameters, EP_REFRESH_RATE, 0).GetInt(),
+                GetParameter(parameters, EP_FRAMEBUFFER_RED_SIZE, 8).GetInt(),
+                GetParameter(parameters, EP_FRAMEBUFFER_GREEN_SIZE, 8).GetInt(),
+                GetParameter(parameters, EP_FRAMEBUFFER_BLUE_SIZE, 8).GetInt(),
+                GetParameter(parameters, EP_FRAMEBUFFER_ALPHA_SIZE, 0).GetInt(),
+                GetParameter(parameters, EP_DEPTHBUFFER_SIZE, 24).GetInt(),
+                GetParameter(parameters, EP_STENCILBUFFER_SIZE, 0).GetInt()
             ))
                 return false;
         }
