@@ -55,7 +55,11 @@ endif ()
 if (IOS)
     set (CMAKE_CROSSCOMPILING TRUE)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -iphoneos -iphonesimulator)
-    set (CMAKE_OSX_SYSROOT iphoneos)    # Set Base SDK to "Latest iOS"
+    if (IOSSIM)
+        set (CMAKE_OSX_SYSROOT iphonesimulator) # Set Base SDK to "Latest iOS"
+    else()
+        set (CMAKE_OSX_SYSROOT iphoneos)        # Set Base SDK to "Latest iOS"
+    endif() 
     # This is a CMake hack in order to make standard CMake check modules that use try_compile() internally work on iOS platform
     # The injected "flags" are not compiler flags, they are actually CMake variables meant for another CMake subprocess that builds the source file being passed in the try_compile() command
     # CAVEAT: these injected "flags" must always be kept at the end of the string variable, i.e. when adding more compiler flags later on then those new flags must be prepended in front of these flags instead
@@ -81,7 +85,11 @@ if (IOS)
 elseif (TVOS)
     set (CMAKE_CROSSCOMPILING TRUE)
     set (CMAKE_XCODE_EFFECTIVE_PLATFORMS -appletvos -appletvsimulator)
-    set (CMAKE_OSX_SYSROOT appletvos)    # Set Base SDK to "Latest tvOS"
+    if (TVOSSIM)
+        set (CMAKE_OSX_SYSROOT appletvsimulator) # Set Base SDK to "Latest iOS"
+    else()
+        set (CMAKE_OSX_SYSROOT appletvos)        # Set Base SDK to "Latest iOS"
+    endif() 
     set (CMAKE_REQUIRED_FLAGS ";-DSmileyHack=byYaoWT;-DCMAKE_MACOSX_BUNDLE=1;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGNING_REQUIRED=0;-DCMAKE_XCODE_ATTRIBUTE_CODE_SIGN_IDENTITY=")
     if (NOT TVOS_SYSROOT)
         execute_process (COMMAND xcodebuild -version -sdk ${CMAKE_OSX_SYSROOT} Path OUTPUT_VARIABLE TVOS_SYSROOT OUTPUT_STRIP_TRAILING_WHITESPACE)   # Obtain tvOS sysroot path
