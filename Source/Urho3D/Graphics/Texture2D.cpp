@@ -57,6 +57,10 @@ void Texture2D::RegisterObject(Context* context)
     context->RegisterFactory<Texture2D>();
 }
 
+int nearestPow2( int value ){
+    return pow( 2, round( log( value ) / log( 2 ) ) ); 
+}
+
 bool Texture2D::BeginLoad(Deserializer& source)
 {
     // In headless mode, do not actually load the texture, just return success
@@ -78,6 +82,14 @@ bool Texture2D::BeginLoad(Deserializer& source)
         loadImage_.Reset();
         return false;
     }
+
+//#if defined IOS || defined TVOS
+//    auto h = loadImage_->GetHeight();
+//    auto w = loadImage_->GetWidth();
+//    if (w > 1 && h > 1 && ((w & (w - 1) || (h & (h - 1)))))
+        //URHO3D_LOGERROR("On iOS textures should be power of two (e.g. 512x512, 256x128)");
+        //loadImage_->Resize( nearestPow2(w), nearestPow2(h) );
+//#endif
 
     // Precalculate mip levels if async loading
     if (GetAsyncLoadState() == ASYNC_LOADING)
@@ -149,6 +161,14 @@ bool Texture2D::SetSize(int width, int height, unsigned format, TextureUsage usa
         SubscribeToEvent(E_RENDERSURFACEUPDATE, URHO3D_HANDLER(Texture2D, HandleRenderSurfaceUpdate));
     else
         UnsubscribeFromEvent(E_RENDERSURFACEUPDATE);
+
+#if defined IOS || defined TVOS
+    auto h = height;
+    auto w = width;
+    if (w > 1 && h > 1 && ((w & (w - 1) || (h & (h - 1)))))
+        //URHO3D_LOGERROR("On iOS textures should be power of two (e.g. 512x512, 256x128)");
+        SetNumLevels(1);
+#endif
 
     width_ = width;
     height_ = height;
