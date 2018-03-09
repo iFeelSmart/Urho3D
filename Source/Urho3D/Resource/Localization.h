@@ -57,6 +57,8 @@ public:
     void SetLanguage(const String& language);
     /// Return a string in the current language. Returns String::EMPTY if id is empty. Returns id if translation is not found and logs a warning.
     String Get(const String& id);
+    /// Set a key
+    void Set(const String& lang, const String& id, const String& text);
     /// Clear all loaded strings.
     void Reset();
     /// Load strings from JSONValue.
