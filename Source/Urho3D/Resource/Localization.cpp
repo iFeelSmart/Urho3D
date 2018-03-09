@@ -145,6 +145,16 @@ String Localization::Get(const String& id)
     return result;
 }
 
+void Localization::Set(const String& lang, const String& id, const String& text)
+{
+    strings_[StringHash(lang)][StringHash(id)] = text;
+
+    if (!languages_.Contains(lang))
+        languages_.Push(lang);
+    if (languageIndex_ == -1)
+        languageIndex_ = 0;
+}
+
 void Localization::Reset()
 {
     languages_.Clear();
@@ -183,11 +193,8 @@ void Localization::LoadJSON(const JSONValue& source)
                 URHO3D_LOGWARNING(
                     "Localization::LoadJSON(source): override translation, string ID=\"" + id + "\", language=\"" + lang + "\"");
             }
-            strings_[StringHash(lang)][StringHash(id)] = string;
-            if (!languages_.Contains(lang))
-                languages_.Push(lang);
-            if (languageIndex_ == -1)
-                languageIndex_ = 0;
+
+            Set( lang, id, string );
         }
     }
 }
