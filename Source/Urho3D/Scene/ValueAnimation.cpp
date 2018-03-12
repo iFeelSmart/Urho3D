@@ -252,6 +252,8 @@ void ValueAnimation::SetValueType(VariantType valueType)
 void ValueAnimation::ClearKeyFrames()
 {
     keyFrames_.Clear();
+    beginTime_ = M_INFINITY;
+    endTime_ = -M_INFINITY;
 }
 
 void ValueAnimation::SetOwner(void* owner)
