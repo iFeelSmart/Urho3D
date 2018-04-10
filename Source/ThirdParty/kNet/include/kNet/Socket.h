@@ -38,7 +38,7 @@ typedef int socklen_t;
 #include <netdb.h>
 #include <errno.h>
 
-#define INVALID_SOCKET ((SOCKET)0)
+#define INVALID_SOCKET ((SOCKET)-1)
 #define KNET_SOCKET_ERROR ((SOCKET)-1)
 #define KNET_ACCEPT_FAILURE ((SOCKET)-1)
 #define KNET_EWOULDBLOCK EWOULDBLOCK
