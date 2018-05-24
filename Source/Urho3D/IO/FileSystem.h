@@ -41,7 +41,7 @@ static const unsigned SCAN_HIDDEN = 0x4;
 /// Subsystem for file and directory operations and access control.
 class URHO3D_API FileSystem : public Object
 {
-	URHO3D_OBJECT(FileSystem, Object);
+    URHO3D_OBJECT(FileSystem, Object);
 
 public:
     /// Construct.
@@ -71,6 +71,8 @@ public:
     bool Rename(const String& srcFileName, const String& destFileName);
     /// Delete a file. Return true if successful.
     bool Delete(const String& fileName);
+    /// Delete a directory. Return true if successful.
+    bool DeleteDir(const String& dirName, bool recursive);
     /// Register a path as allowed to access. If no paths are registered, all are allowed. Registering allowed paths is considered securing the Urho3D execution environment: running programs and opening files externally through the system will fail afterward.
     void RegisterPath(const String& pathName);
     /// Set a file's last modified time as seconds since 1.1.1970. Return true on success.
@@ -99,9 +101,12 @@ public:
     String GetProgramDir() const;
     /// Return the user documents directory.
     String GetUserDocumentsDir() const;
+
+    /// Return the temporary directory.
+    String GetTempDir() const;
     /// Return the application preferences directory.
     String GetAppPreferencesDir(const String& org, const String& app) const;
-    /// Return path of temporary directory. Path always ends with a forward slash.
+	/// Return path of temporary directory. Path always ends with a forward slash.
     String GetTemporaryDir() const;
 
 private:
@@ -125,7 +130,7 @@ private:
 
 /// Split a full path to path, filename and extension. The extension will be converted to lowercase by default.
 URHO3D_API void
-	SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
+    SplitPath(const String& fullPath, String& pathName, String& fileName, String& extension, bool lowercaseExtension = true);
 /// Return the path from a full path.
 URHO3D_API String GetPath(const String& fullPath);
 /// Return the relative filename from the directory name.

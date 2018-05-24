@@ -245,6 +245,7 @@ static SDL_bool bHasNewData;
 
 // Urho3D: application files dir
 static char* mFilesDir = 0;
+static char* mCacheDir = 0;
 
 /*******************************************************************************
                  Functions called by JNI
@@ -286,6 +287,11 @@ void checkJNIReady()
 const char* SDL_Android_GetFilesDir()
 {
     return mFilesDir;
+}
+
+const char* SDL_Android_GetCacheDir()
+{
+    return mCacheDir;
 }
 
 /* Activity initialization -- called before SDL_main() to initialize JNI bindings */

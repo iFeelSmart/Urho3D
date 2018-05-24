@@ -70,6 +70,7 @@ extern "C"
 {
 #ifdef __ANDROID__
 const char* SDL_Android_GetFilesDir();
+const char* SDL_Android_GetCacheDir();
 char** SDL_Android_GetFileList(const char* path, int* count);
 void SDL_Android_FreeFileList(char*** array, int* count);
 #elif defined(IOS) || defined(TVOS)
@@ -769,6 +770,25 @@ String FileSystem::GetUserDocumentsDir() const
 {
 #if defined(__ANDROID__)
     return AddTrailingSlash(SDL_Android_GetFilesDir());
+#elif defined(IOS) || defined(TVOS)
+    return AddTrailingSlash(SDL_IOS_GetDocumentsDir());
+#elif defined(_WIN32)
+    wchar_t pathName[MAX_PATH];
+    pathName[0] = 0;
+    SHGetSpecialFolderPathW(nullptr, pathName, CSIDL_PERSONAL, 0);
+    return AddTrailingSlash(String(pathName));
+#else
+    char pathName[MAX_PATH];
+    pathName[0] = 0;
+    strcpy(pathName, getenv("HOME"));
+    return AddTrailingSlash(String(pathName));
+#endif
+}
+
+String FileSystem::GetTempDir() const
+{
+#if defined(__ANDROID__)
+    return AddTrailingSlash(SDL_Android_GetCacheDir());
 #elif defined(IOS) || defined(TVOS)
     return AddTrailingSlash(SDL_IOS_GetDocumentsDir());
 #elif defined(_WIN32)

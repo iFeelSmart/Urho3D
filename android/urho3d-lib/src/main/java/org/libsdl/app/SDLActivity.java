@@ -483,6 +483,7 @@ public class SDLActivity extends Activity {
     // C functions we call
     public static native int nativeSetupJNI();
     public static native int nativeRunMain(String library, String function, Object arguments);
+
     public static native void nativeLowMemory();
     public static native void nativeQuit();
     public static native void nativePause();
