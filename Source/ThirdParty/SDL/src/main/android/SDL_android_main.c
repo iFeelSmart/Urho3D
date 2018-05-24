@@ -19,13 +19,13 @@
 
 // Urho3D: added extra filesDir parameter
 /* Called before SDL_main() to initialize JNI bindings in SDL library */
-extern void SDL_Android_Init(JNIEnv* env, jclass cls, jstring filesDir);
+extern void SDL_Android_Init(JNIEnv* env, jclass cls, jstring filesDir, jstring cacheDir);
 
 /* This prototype is needed to prevent a warning about the missing prototype for global function below */
-JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject array, jstring filesDir);
+JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject array, jstring filesDir, jstring cacheDir);
 
 /* Start up the SDL app */
-JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject array, jstring filesDir)
+JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jclass cls, jobject array, jstring filesDir, jstring cacheDir)
 {
     int i;
     int argc;
@@ -34,7 +34,7 @@ JNIEXPORT int JNICALL Java_org_libsdl_app_SDLActivity_nativeInit(JNIEnv* env, jc
     char** argv;
 
     /* This interface could expand with ABI negotiation, callbacks, etc. */
-    SDL_Android_Init(env, cls, filesDir);
+    SDL_Android_Init(env, cls, filesDir, cacheDir);
 
     SDL_SetMainReady();
 

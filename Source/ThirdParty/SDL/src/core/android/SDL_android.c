@@ -90,6 +90,7 @@ static SDL_bool bHasNewData;
 
 // Urho3D: application files dir
 static char* mFilesDir = 0;
+static char* mCacheDir = 0;
 
 /*******************************************************************************
                  Functions called by JNI
@@ -123,9 +124,14 @@ const char* SDL_Android_GetFilesDir()
     return mFilesDir;
 }
 
+const char* SDL_Android_GetCacheDir()
+{
+    return mCacheDir;
+}
+
 /* Called before SDL_main() to initialize JNI bindings */
 // Urho3D: added passing user files directory from SDLActivity on startup
-JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv* mEnv, jclass cls, jstring filesDir)
+JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv* mEnv, jclass cls, jstring filesDir, jstring cacheDir)
 {
     __android_log_print(ANDROID_LOG_INFO, "SDL", "SDL_Android_Init()");
 
@@ -145,6 +151,18 @@ JNIEXPORT void JNICALL SDL_Android_Init(JNIEnv* mEnv, jclass cls, jstring filesD
         (*mEnv)->ReleaseStringUTFChars(mEnv, filesDir, str);
     }
 
+    str = (*mEnv)->GetStringUTFChars(mEnv, cacheDir, 0);
+    if (str)
+    {
+        if (mCacheDir)
+            free(mCacheDir);
+
+        size_t length = strlen(str) + 1;
+        mCacheDir = (char*)malloc(length);
+        memcpy(mCacheDir, str, length);
+        (*mEnv)->ReleaseStringUTFChars(mEnv, cacheDir, str);
+    }
+    
     mActivityClass = (jclass)((*mEnv)->NewGlobalRef(mEnv, cls));
 
     midGetNativeSurface = (*mEnv)->GetStaticMethodID(mEnv, mActivityClass,

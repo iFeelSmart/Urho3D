@@ -424,7 +424,7 @@ public class SDLActivity extends Activity {
 
     // C functions we call
     // Urho3D: added parameter
-    public static native int nativeInit(Object arguments, String filesDir);
+    public static native int nativeInit(Object arguments, String filesDir, String cacheDir);
     public static native void nativeLowMemory();
     public static native void nativeQuit();
     public static native void nativePause();
@@ -1041,7 +1041,7 @@ class SDLMain implements Runnable {
     public void run() {
         // Runs SDL_main()
         // Urho3D: pass filesDir
-        SDLActivity.nativeInit(SDLActivity.mSingleton.getArguments(), ((Activity)SDLActivity.getContext()).getFilesDir().getAbsolutePath());
+        SDLActivity.nativeInit(SDLActivity.mSingleton.getArguments(), ((Activity)SDLActivity.getContext()).getFilesDir().getAbsolutePath(), ((Activity)SDLActivity.getContext()).getCacheDir().getAbsolutePath());
 
         //Log.v("SDL", "SDL thread terminated");
     }
