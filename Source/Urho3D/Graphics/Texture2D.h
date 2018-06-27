@@ -84,6 +84,8 @@ private:
 
     /// Render surface.
     SharedPtr<RenderSurface> renderSurface_;
+
+protected:
     /// Image file acquired during BeginLoad.
     SharedPtr<Image> loadImage_;
     /// Parameter file acquired during BeginLoad.
