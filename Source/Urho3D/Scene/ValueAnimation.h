@@ -130,7 +130,8 @@ public:
 
     /// Return all key frames.
     const Vector<VAnimKeyFrame>& GetKeyFrames() const { return keyFrames_; }
-
+ 
+ 
     /// Has event frames.
     bool HasEventFrames() const { return !eventFrames_.Empty(); }
 
