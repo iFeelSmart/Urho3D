@@ -86,6 +86,20 @@ URHO3D_EVENT(E_ATTRIBUTEANIMATIONREMOVED, AttributeAnimationRemoved)
     URHO3D_PARAM(P_ATTRIBUTEANIMATIONNAME, AttributeAnimationName); // String
 }
 
+/// Object animation added to object.
+URHO3D_EVENT(E_OBJECTANIMATIONADDED, ObjectAnimationAdded)
+{
+    URHO3D_PARAM(P_OBJECTANIMATIONPOOL, ObjectAnimationPool); // Object animation pool pointer
+    URHO3D_PARAM(P_OBJECTANIMATIONNAME, ObjectAnimationName); // String
+}
+
+/// Object animation added to object.
+URHO3D_EVENT(E_OBJECTANIMATIONREMOVED, ObjectAnimationRemoved)
+{
+    URHO3D_PARAM(P_OBJECTANIMATIONPOOL, ObjectAnimationPool); // Object animation pool pointer
+    URHO3D_PARAM(P_OBJECTANIMATIONNAME, ObjectAnimationName); // String
+}
+
 /// Variable timestep scene post-update.
 URHO3D_EVENT(E_SCENEPOSTUPDATE, ScenePostUpdate)
 {

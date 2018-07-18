@@ -30,6 +30,8 @@ namespace Urho3D
 
 class XMLElement;
 class JSONValue;
+class Tween;
+
 
 /// Interpolation method.
 enum InterpMethod
@@ -40,6 +42,43 @@ enum InterpMethod
 	IM_LINEAR,
 	/// Cardinal spline interpolation, default tension value is 0.5f. For more information please refer to http://cubic.org/docs/hermite.htm.
 	IM_SPLINE,
+
+    /// LINEAR BASED ADDONS BY TWEEN
+    IM_QUAD_IN,
+    IM_QUAD_OUT,
+    IM_QUAD_INOUT,
+
+    IM_CUBIC_IN,
+    IM_CUBIC_OUT,
+    IM_CUBIC_INOUT,
+
+    IM_QUART_IN,
+    IM_QUART_OUT,
+    IM_QUART_INOUT,
+
+    IM_QUINT_IN,
+    IM_QUINT_OUT,
+    IM_QUINT_INOUT,
+
+    IM_CIRCULAR_IN,
+    IM_CIRCULAR_OUT,
+    IM_CIRCULAR_NOUT,
+
+    IM_EXPO_IN,
+    IM_EXPO_OUT,
+    IM_EXPO_INOUT,
+
+    IM_ELASTIC_IN,
+    IM_ELASTIC_OUT,
+    IM_ELASTIC_INOUT,
+
+    IM_BACK_IN,
+    IM_BACK_OUT,
+    IM_BACK_INOUT,
+
+    IM_BOUNCE_IN,
+    IM_BOUNCE_OUT,
+    IM_BOUNCE_INOUT,
 };
 
 /// Value animation key frame.
@@ -102,6 +141,11 @@ public:
 
 	/// Set key frame.
 	bool SetKeyFrame(float time, const Variant& value);
+    /// Move key frame.
+    bool MoveKeyFrame( int id, float time );
+    /// Delete key frame.
+    VAnimKeyFrame DeleteKeyFrame( int id );
+
 	/// Set event frame.
 	void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
 
@@ -164,6 +208,8 @@ protected:
 	float endTime_;
 	/// Key frames.
 	Vector<VAnimKeyFrame> keyFrames_;
+    /// Interpolate Linear based tween.
+    SharedPtr< Tween > tween_;
 	/// Spline tangents.
 	VariantVector splineTangents_;
 	/// Spline tangents dirty.
