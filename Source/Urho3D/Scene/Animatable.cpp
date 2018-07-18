@@ -28,6 +28,7 @@
 #include "../Resource/JSONValue.h"
 #include "../Resource/XMLElement.h"
 #include "../Scene/Animatable.h"
+#include "../Scene/ObjectAnimationPool.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/SceneEvents.h"
 #include "../Scene/ValueAnimation.h"
@@ -70,6 +71,8 @@ Animatable::~Animatable() = default;
 
 void Animatable::RegisterObject(Context* context)
 {
+    URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation Pool", GetObjectAnimationPoolAttr, SetObjectAnimationPoolAttr, ResourceRef,
+        ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
         ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
@@ -80,9 +83,20 @@ bool Animatable::LoadXML(const XMLElement& source)
         return false;
 
     SetObjectAnimation(nullptr);
+    SetObjectAnimationPool(nullptr);
     attributeAnimationInfos_.Clear();
 
-    XMLElement elem = source.GetChild("objectanimation");
+    XMLElement elem = source.GetChild("objectanimationpool");
+    if (elem)
+    {
+        SharedPtr<ObjectAnimationPool> objectAnimationPool(new ObjectAnimationPool(context_));
+        if (!objectAnimationPool->LoadXML(elem))
+            return false;
+
+        SetObjectAnimationPool(objectAnimationPool);
+    }
+
+    elem = source.GetChild("objectanimation");
     if (elem)
     {
         SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
@@ -126,9 +140,20 @@ bool Animatable::LoadJSON(const JSONValue& source)
         return false;
 
     SetObjectAnimation(nullptr);
+    SetObjectAnimationPool(nullptr);
     attributeAnimationInfos_.Clear();
 
-    JSONValue value = source.Get("objectanimation");
+    JSONValue value = source.Get("objectanimationpool");
+    if (!value.IsNull())
+    {
+        SharedPtr<ObjectAnimationPool> objectAnimationPool(new ObjectAnimationPool(context_));
+        if (!objectAnimationPool->LoadJSON(value))
+            return false;
+
+        SetObjectAnimationPool(objectAnimationPool);
+    }
+
+    value = source.Get("objectanimation");
     if (!value.IsNull())
     {
         SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
@@ -181,6 +206,14 @@ bool Animatable::SaveXML(XMLElement& dest) const
     if (!Serializable::SaveXML(dest))
         return false;
 
+    // Object animation pool
+    if (objectAnimationPool_ && objectAnimationPool_->GetName().Empty())
+    {
+        XMLElement elem = dest.CreateChild("objectanimationpool");
+        if (!objectAnimationPool_->SaveXML(elem))
+            return false;
+    }
+
     // Object animation without name
     if (objectAnimation_ && objectAnimation_->GetName().Empty())
     {
@@ -214,6 +247,15 @@ bool Animatable::SaveJSON(JSONValue& dest) const
 {
     if (!Serializable::SaveJSON(dest))
         return false;
+
+    // Object animation without name
+    if (objectAnimationPool_ && objectAnimationPool_->GetName().Empty())
+    {
+        JSONValue objectAnimationPoolValue;
+        if (!objectAnimationPool_->SaveJSON(objectAnimationPoolValue))
+            return false;
+        dest.Set("objectanimationpool", objectAnimationPoolValue);
+    }
 
     // Object animation without name
     if (objectAnimation_ && objectAnimation_->GetName().Empty())
@@ -292,6 +334,44 @@ void Animatable::SetAnimationTime(float time)
         for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
             i != attributeAnimationInfos_.End(); ++i)
             i->second_->SetTime(time);
+    }
+}
+
+void Animatable::SetAnimation( const String& name )
+{
+    if ( !objectAnimationPool_ )
+        objectAnimationPool_ = new ObjectAnimationPool( context_ );
+
+    if( !objectAnimationPool_->GetObjectAnimationNames().Contains( name ) )
+        objectAnimationPool_->AddObjectAnimation( name,  new ObjectAnimation( context_ ) );
+
+    SetObjectAnimation( objectAnimationPool_->GetObjectAnimation( name ) );
+}
+
+String Animatable::GetAnimation() const
+{
+    if ( objectAnimationPool_ )
+    {
+        return objectAnimationPool_->GetObjectAnimationName( GetObjectAnimation() );
+    }
+    return "";
+}
+
+void Animatable::SetObjectAnimationPool(ObjectAnimationPool* objectAnimationPool)
+{
+    if (objectAnimationPool == objectAnimationPool_)
+        return;
+
+    if ( objectAnimationPool_ )
+    {
+        OnObjectAnimationPoolRemoved(objectAnimationPool_);
+    }
+
+    objectAnimationPool_ = objectAnimationPool;
+
+    if (objectAnimationPool_)
+    {
+        OnObjectAnimationPoolAdded(objectAnimationPool_);
     }
 }
 
@@ -425,6 +505,16 @@ ObjectAnimation* Animatable::GetObjectAnimation() const
     return objectAnimation_;
 }
 
+ObjectAnimationPool* Animatable::GetObjectAnimationPool() const
+{
+    return objectAnimationPool_;
+}
+
+void Animatable::RemoveObjectAnimationPool()
+{
+    SetObjectAnimationPool(nullptr);
+}
+
 ValueAnimation* Animatable::GetAttributeAnimation(const String& name) const
 {
     const AttributeAnimationInfo* info = GetAttributeAnimationInfo(name);
@@ -461,6 +551,20 @@ void Animatable::SetObjectAnimationAttr(const ResourceRef& value)
 ResourceRef Animatable::GetObjectAnimationAttr() const
 {
     return GetResourceRef(objectAnimation_, ObjectAnimation::GetTypeStatic());
+}
+
+void Animatable::SetObjectAnimationPoolAttr(const ResourceRef& value)
+{
+    if (!value.name_.Empty())
+    {
+        ResourceCache* cache = GetSubsystem<ResourceCache>();
+        SetObjectAnimationPool(cache->GetResource<ObjectAnimationPool>(value.name_));
+    }
+}
+
+ResourceRef Animatable::GetObjectAnimationPoolAttr() const
+{
+    return GetResourceRef(objectAnimationPool_, ObjectAnimationPool::GetTypeStatic());
 }
 
 Animatable* Animatable::FindAttributeAnimationTarget(const String& name, String& outName)
@@ -503,6 +607,18 @@ void Animatable::OnObjectAnimationRemoved(ObjectAnimation* objectAnimation)
     const HashMap<String, SharedPtr<ValueAnimationInfo> >& infos = objectAnimation->GetAttributeAnimationInfos();
     for (HashMap<String, SharedPtr<ValueAnimationInfo> >::ConstIterator i = infos.Begin(); i != infos.End(); ++i)
         SetObjectAttributeAnimation(i->first_, nullptr, WM_LOOP, 1.0f);
+}
+
+void Animatable::OnObjectAnimationPoolAdded(ObjectAnimationPool* objectAnimationPool)
+{
+    if (!objectAnimationPool)
+        return;
+}
+
+void Animatable::OnObjectAnimationPoolRemoved(ObjectAnimationPool* objectAnimationPool)
+{
+    if (!objectAnimationPool)
+        return;
 }
 
 void Animatable::UpdateAttributeAnimations(float timeStep)

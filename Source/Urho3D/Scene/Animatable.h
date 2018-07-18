@@ -32,6 +32,7 @@ namespace Urho3D
 class Animatable;
 class ValueAnimation;
 class AttributeAnimationInfo;
+class ObjectAnimationPool;
 class ObjectAnimation;
 
 /// Attribute animation instance.
@@ -86,6 +87,15 @@ public:
     /// Set time position of all attribute animations or an object animation manually. Automatic update should be disabled in this case.
     void SetAnimationTime(float time);
 
+    /// Set object animation pool.
+    void SetObjectAnimationPool(ObjectAnimationPool* objectAnimationPool);
+    /// Remove object animation pool. Same as calling SetObjectAnimationPool with a null pointer.
+    void RemoveObjectAnimationPool();
+    /// Play Animation from pool name 
+    void SetAnimation(const String& name);
+    /// Get Animation name from pool
+    String GetAnimation() const;
+
     /// Set object animation.
     void SetObjectAnimation(ObjectAnimation* objectAnimation);
     /// Set attribute animation.
@@ -105,6 +115,8 @@ public:
     /// Return animation enabled.
     bool GetAnimationEnabled() const { return animationEnabled_; }
 
+    /// Return object animation pool.
+    ObjectAnimationPool* GetObjectAnimationPool() const;
     /// Return object animation.
     ObjectAnimation* GetObjectAnimation() const;
     /// Return attribute animation.
@@ -115,6 +127,11 @@ public:
     float GetAttributeAnimationSpeed(const String& name) const;
     /// Return attribute animation time position.
     float GetAttributeAnimationTime(const String& name) const;
+
+    /// Set object animation pool attribute.
+    void SetObjectAnimationPoolAttr(const ResourceRef& value);
+    /// Return object animation pool attribute.
+    ResourceRef GetObjectAnimationPoolAttr() const;
 
     /// Set object animation attribute.
     void SetObjectAnimationAttr(const ResourceRef& value);
@@ -128,6 +145,10 @@ protected:
     virtual void OnAttributeAnimationRemoved() = 0;
     /// Find target of an attribute animation from object hierarchy by name.
     virtual Animatable* FindAttributeAnimationTarget(const String& name, String& outName);
+    /// Handle object animation added.
+    void OnObjectAnimationPoolAdded(ObjectAnimationPool* objectAnimationPool);
+    /// Handle object animation removed.
+    void OnObjectAnimationPoolRemoved(ObjectAnimationPool* objectAnimationPool);
     /// Set object attribute animation internal.
     void SetObjectAttributeAnimation(const String& name, ValueAnimation* attributeAnimation, WrapMode wrapMode, float speed);
     /// Handle object animation added.
@@ -147,6 +168,8 @@ protected:
 
     /// Animation enabled.
     bool animationEnabled_;
+    /// Animation Pool.
+    SharedPtr<ObjectAnimationPool> objectAnimationPool_;
     /// Animation.
     SharedPtr<ObjectAnimation> objectAnimation_;
     /// Animated network attribute set.

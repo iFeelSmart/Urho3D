@@ -32,6 +32,7 @@
 #include "../Scene/Animatable.h"
 #include "../Scene/ObjectAnimation.h"
 #include "../Scene/ValueAnimation.h"
+#include "../Scene/Tween.h"
 
 #include "../DebugNew.h"
 
@@ -43,8 +44,49 @@ const char* interpMethodNames[] =
     "None",
     "Linear",
     "Spline",
+
+    "QuadraticIn",
+    "QuadraticOut",
+    "QuadraticInOut",
+
+    "CubicIn",
+    "CubicOut",
+    "CubicInOut",
+
+    "QuarticEaseIn",
+    "QuarticEaseOut",
+    "QuarticEaseInOut",
+
+    "QuinticIn",
+    "QuinticOut",
+    "QuinticInOut",
+
+    "SineIn",
+    "SineOut",
+    "SineInOut",
+
+    "CircularIn",
+    "CircularOut",
+    "CircularInOut",
+
+    "ExponentialIn",
+    "ExponentialOut",
+    "ExponentialInOut",
+
+    "ElasticIn",
+    "ElasticOut",
+    "ElasticInOut",
+
+    "BackIn",
+    "BackOut",
+    "BackInOut",
+
+    "BounceIn",
+    "BounceOut",
+    "BounceInOut",
     nullptr
 };
+
 
 ValueAnimation::ValueAnimation(Context* context) :
     Resource(context),
@@ -269,6 +311,50 @@ void ValueAnimation::SetInterpolationMethod(InterpMethod method)
         method = IM_LINEAR;
 
     interpolationMethod_ = method;
+    tween_.Reset();
+
+    switch( interpolationMethod_ )
+    {
+        case IM_QUAD_IN:       tween_ = new QuadraticEaseIn(); break;
+        case IM_QUAD_OUT:      tween_ = new QuadraticEaseOut(); break;
+        case IM_QUAD_INOUT:    tween_ = new QuadraticEaseInOut(); break;
+
+        case IM_CUBIC_IN:      tween_ = new CubicEaseIn(); break;
+        case IM_CUBIC_OUT:     tween_ = new CubicEaseOut(); break;
+        case IM_CUBIC_INOUT:   tween_ = new CubicEaseInOut(); break;
+
+        case IM_QUART_IN:      tween_ = new QuarticEaseIn(); break;
+        case IM_QUART_OUT:     tween_ = new QuarticEaseOut(); break;
+        case IM_QUART_INOUT:   tween_ = new QuarticEaseInOut(); break;
+
+        case IM_QUINT_IN:      tween_ = new QuinticEaseIn(); break;
+        case IM_QUINT_OUT:     tween_ = new QuinticEaseOut(); break;
+        case IM_QUINT_INOUT:   tween_ = new QuinticEaseInOut(); break;
+
+        case IM_CIRCULAR_IN:   tween_ = new CircularEaseIn(); break;
+        case IM_CIRCULAR_OUT:  tween_ = new CircularEaseOut(); break;
+        case IM_CIRCULAR_NOUT: tween_ = new CircularEaseInOut(); break;
+
+        case IM_EXPO_IN:       tween_ = new ExponentialEaseIn(); break;
+        case IM_EXPO_OUT:      tween_ = new ExponentialEaseOut(); break;
+        case IM_EXPO_INOUT:    tween_ = new ExponentialEaseInOut(); break;
+
+        case IM_ELASTIC_IN:    tween_ = new ElasticEaseIn(); break;
+        case IM_ELASTIC_OUT:   tween_ = new ElasticEaseOut(); break;
+        case IM_ELASTIC_INOUT: tween_ = new ElasticEaseInOut(); break;
+
+        case IM_BACK_IN:       tween_ = new BackEaseIn(); break;
+        case IM_BACK_OUT:      tween_ = new BackEaseOut(); break;
+        case IM_BACK_INOUT:    tween_ = new BackEaseInOut(); break;
+
+        case IM_BOUNCE_IN:     tween_ = new BounceEaseIn(); break;
+        case IM_BOUNCE_OUT:    tween_ = new BounceEaseOut(); break;
+        case IM_BOUNCE_INOUT:  tween_ = new BounceEaseInOut(); break;
+
+    default:
+        break;
+    }
+
     splineTangentsDirty_ = true;
 }
 
@@ -276,6 +362,14 @@ void ValueAnimation::SetSplineTension(float tension)
 {
     splineTension_ = tension;
     splineTangentsDirty_ = true;
+}
+
+bool ValueAnimation::MoveKeyFrame( int id, float time )
+{
+    VAnimKeyFrame deletedKeyFrame = DeleteKeyFrame( id );
+    if ( deletedKeyFrame.time_ != -NAN )
+        return SetKeyFrame( deletedKeyFrame.time_, deletedKeyFrame.value_ );
+    return false;
 }
 
 bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
@@ -311,6 +405,30 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
     splineTangentsDirty_ = true;
 
     return true;
+}
+
+VAnimKeyFrame ValueAnimation::DeleteKeyFrame( int id )
+{
+    VAnimKeyFrame keyframe;
+    keyframe.time_ = -NAN;
+
+    if ( !keyFrames_.Empty() )
+    {
+        if ( id < keyFrames_.Size() )
+        {
+            keyframe = keyFrames_.At(id);
+            keyFrames_.Erase( id );
+            if ( keyFrames_.Size() )
+            {
+                beginTime_ = Min( keyFrames_.Front().time_, beginTime_);
+                endTime_ = Max( keyFrames_.Back().time_ , endTime_);
+            }
+            splineTangentsDirty_ = true;
+        }
+    }
+
+    // return deleted keyframe copy
+    return keyframe;
 }
 
 void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData)
@@ -358,10 +476,10 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime) const
         return keyFrames_[index - 1].value_;
     else
     {
-        if (interpolationMethod_ == IM_LINEAR)
-            return LinearInterpolation(index - 1, index, scaledTime);
-        else
+        if (interpolationMethod_ == IM_SPLINE)
             return SplineInterpolation(index - 1, index, scaledTime);
+        else
+            return LinearInterpolation(index - 1, index, scaledTime);
     }
 }
 
@@ -384,6 +502,12 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     const VAnimKeyFrame& keyFrame2 = keyFrames_[index2];
 
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
+
+    if( interpolationMethod_ != IM_LINEAR && tween_.Get() )
+    {
+        scaledTime = (*tween_)( scaledTime );
+    }
+
     const Variant& value1 = keyFrame1.value_;
     const Variant& value2 = keyFrame2.value_;
 
