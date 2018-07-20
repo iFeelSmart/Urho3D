@@ -574,6 +574,11 @@ ResourceRef Animatable::GetObjectAnimationPoolAttr() const
     return GetResourceRef(objectAnimationPool_, ObjectAnimationPool::GetTypeStatic());
 }
 
+Animatable* Animatable::GetAttributeAnimationTarget(const String& name, String& outName)
+{
+    return FindAttributeAnimationTarget( name, outName );
+}
+
 Animatable* Animatable::FindAttributeAnimationTarget(const String& name, String& outName)
 {
     // Base implementation only handles self
