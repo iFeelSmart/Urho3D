@@ -138,6 +138,9 @@ public:
     /// Return object animation attribute.
     ResourceRef GetObjectAnimationAttr() const;
 
+    /// Get target of an attribute animation from object hierarchy by name.
+    Animatable* GetAttributeAnimationTarget(const String& name, String& outName);
+
 protected:
     /// Handle attribute animation added.
     virtual void OnAttributeAnimationAdded() = 0;
