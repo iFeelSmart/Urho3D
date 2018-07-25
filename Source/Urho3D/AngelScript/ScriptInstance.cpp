@@ -179,7 +179,8 @@ void ScriptInstance::ApplyAttributes()
             Component*& componentPtr = *(reinterpret_cast<Component**>(attr.ptr_));
             if (componentPtr)
                 componentPtr->ReleaseRef();
-            componentPtr = GetScene()->GetComponent(i->second_);
+            if( GetScene() )
+                componentPtr = GetScene()->GetComponent(i->second_);
             if (componentPtr)
                 componentPtr->AddRef();
         }
