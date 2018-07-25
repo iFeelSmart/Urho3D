@@ -531,6 +531,17 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     case VAR_COLOR:
         return value1.GetColor().Lerp(value2.GetColor(), t);
 
+    case VAR_MATRIX3X4:
+        {
+            const Matrix3x4& m34Value1 = value1.GetMatrix3x4();
+            const Matrix3x4& m34Value2 = value2.GetMatrix3x4();
+
+            Vector3 v = m34Value1.Translation().Lerp(m34Value2.Translation(), t);
+            Quaternion q = m34Value1.Rotation().Slerp(m34Value2.Rotation(), t);
+            Vector3 s = m34Value1.Scale().Lerp(m34Value2.Scale(), t);
+
+            return Matrix3x4( v, q, s );
+        }
     case VAR_INTRECT:
         {
             float s = 1.0f - t;
