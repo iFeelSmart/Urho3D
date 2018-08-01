@@ -30,7 +30,7 @@ namespace Urho3D
 
 class XMLElement;
 class JSONValue;
-class Tween;
+class ITween;
 
 
 /// Interpolation method.
@@ -62,7 +62,11 @@ enum InterpMethod
 
     IM_CIRCULAR_IN,
     IM_CIRCULAR_OUT,
-    IM_CIRCULAR_NOUT,
+    IM_CIRCULAR_INOUT,
+
+    IM_SINE_IN,
+    IM_SINE_OUT,
+    IM_SINE_INOUT,
 
     IM_EXPO_IN,
     IM_EXPO_OUT,
@@ -141,8 +145,8 @@ public:
 
 	/// Set key frame.
 	bool SetKeyFrame(float time, const Variant& value);
-    /// Move key frame.
-    bool MoveKeyFrame( int id, float time );
+    /// Move key frame. return new id
+    int MoveKeyFrame( int id, float time );
     /// Delete key frame.
     VAnimKeyFrame DeleteKeyFrame( int id );
 
@@ -209,7 +213,7 @@ protected:
 	/// Key frames.
 	Vector<VAnimKeyFrame> keyFrames_;
     /// Interpolate Linear based tween.
-    SharedPtr< Tween > tween_;
+    SharedPtr< ITween > tween_;
 	/// Spline tangents.
 	VariantVector splineTangents_;
 	/// Spline tangents dirty.

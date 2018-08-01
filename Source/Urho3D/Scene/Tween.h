@@ -5,14 +5,14 @@
 
 namespace Urho3D
 {
-    class Tween : public Urho3D::RefCounted
+    class ITween : public Urho3D::RefCounted
     {
         public:
 
             virtual float operator()( float fParam ) = 0;
     };
 
-    class Linear: public Tween
+    class LinearInterpolation: public ITween
     {
         public:
 
@@ -23,7 +23,7 @@ namespace Urho3D
     };
 
     // Modeled after the parabola y = x^2
-    class QuadraticEaseIn : public Tween
+    class QuadraticEaseIn : public ITween
     {
         public:
 
@@ -34,7 +34,7 @@ namespace Urho3D
     };
 
     // Modeled after the parabola y = -x^2 + 2x
-    class QuadraticEaseOut : public Tween
+    class QuadraticEaseOut : public ITween
     {
         public:
 
@@ -47,7 +47,7 @@ namespace Urho3D
     // Modeled after the piecewise quadratic
     // y = (1/2)((2x)^2)             ; [0, 0.5)
     // y = -(1/2)((2x-1)*(2x-3) - 1) ; [0.5, 1]
-    class QuadraticEaseInOut : public Tween
+    class QuadraticEaseInOut : public ITween
     {
         public:
 
@@ -65,7 +65,7 @@ namespace Urho3D
     };
 
     // Modeled after the cubic y = x^3
-    class CubicEaseIn : public Tween
+    class CubicEaseIn : public ITween
     {
         public:
 
@@ -76,7 +76,7 @@ namespace Urho3D
     };
 
     // Modeled after the cubic y = (x - 1)^3 + 1
-    class CubicEaseOut : public Tween
+    class CubicEaseOut : public ITween
     {
         public:
 
@@ -90,7 +90,7 @@ namespace Urho3D
     // Modeled after the piecewise cubic
     // y = (1/2)((2x)^3)       ; [0, 0.5)
     // y = (1/2)((2x-2)^3 + 2) ; [0.5, 1]
-    class CubicEaseInOut : public Tween
+    class CubicEaseInOut : public ITween
     {
         public:
 
@@ -109,7 +109,7 @@ namespace Urho3D
     };
 
     // Modeled after the quartic x^4
-    class QuarticEaseIn : public Tween
+    class QuarticEaseIn : public ITween
     {
         public:
 
@@ -120,7 +120,7 @@ namespace Urho3D
     };
 
     // Modeled after the quartic y = 1 - (x - 1)^4
-    class QuarticEaseOut : public Tween
+    class QuarticEaseOut : public ITween
     {
         public:
 
@@ -134,7 +134,7 @@ namespace Urho3D
     // Modeled after the piecewise quartic
     // y = (1/2)((2x)^4)        ; [0, 0.5)
     // y = -(1/2)((2x-2)^4 - 2) ; [0.5, 1]
-    class QuarticEaseInOut : public Tween
+    class QuarticEaseInOut : public ITween
     {
         public:
 
@@ -153,7 +153,7 @@ namespace Urho3D
     };
 
     // Modeled after the quintic y = x^5
-    class QuinticEaseIn : public Tween
+    class QuinticEaseIn : public ITween
     {
         public:
 
@@ -164,7 +164,7 @@ namespace Urho3D
     };
 
     // Modeled after the quintic y = (x - 1)^5 + 1
-    class QuinticEaseOut : public Tween
+    class QuinticEaseOut : public ITween
     {
         public:
 
@@ -178,7 +178,7 @@ namespace Urho3D
     // Modeled after the piecewise quintic
     // y = (1/2)((2x)^5)       ; [0, 0.5)
     // y = (1/2)((2x-2)^5 + 2) ; [0.5, 1]
-    class QuinticEaseInOut : public Tween
+    class QuinticEaseInOut : public ITween
     {
         public:
 
@@ -197,7 +197,7 @@ namespace Urho3D
     };
 
     // Modeled after quarter-cycle of sine wave
-    class SineEaseIn : public Tween
+    class SineEaseIn : public ITween
     {
         public:
 
@@ -208,7 +208,7 @@ namespace Urho3D
     };
 
     // Modeled after quarter-cycle of sine wave (different phase)
-    class SineEaseOut : public Tween
+    class SineEaseOut : public ITween
     {
         public:
 
@@ -219,7 +219,7 @@ namespace Urho3D
     };
 
     // Modeled after half sine wave
-    class SineEaseInOut : public Tween
+    class SineEaseInOut : public ITween
     {
         public:
 
@@ -230,7 +230,7 @@ namespace Urho3D
     };
 
     // Modeled after shifted quadrant IV of unit circle
-    class CircularEaseIn : public Tween
+    class CircularEaseIn : public ITween
     {
         public:
 
@@ -241,7 +241,7 @@ namespace Urho3D
     };
 
     // Modeled after shifted quadrant II of unit circle
-    class CircularEaseOut : public Tween
+    class CircularEaseOut : public ITween
     {
         public:
 
@@ -254,7 +254,7 @@ namespace Urho3D
     // Modeled after the piecewise circular function
     // y = (1/2)(1 - sqrt(1 - 4x^2))           ; [0, 0.5)
     // y = (1/2)(sqrt(-(2x - 3)*(2x - 1)) + 1) ; [0.5, 1]
-    class CircularEaseInOut : public Tween
+    class CircularEaseInOut : public ITween
     {
         public:
 
@@ -272,7 +272,7 @@ namespace Urho3D
     };
 
     // Modeled after the exponential function y = 2^(10(x - 1))
-    class ExponentialEaseIn : public Tween
+    class ExponentialEaseIn : public ITween
     {
         public:
 
@@ -283,7 +283,7 @@ namespace Urho3D
     };
 
     // Modeled after the exponential function y = -2^(-10x) + 1
-    class ExponentialEaseOut : public Tween
+    class ExponentialEaseOut : public ITween
     {
         public:
 
@@ -296,7 +296,7 @@ namespace Urho3D
     // Modeled after the piecewise exponential
     // y = (1/2)2^(10(2x - 1))         ; [0,0.5)
     // y = -(1/2)*2^(-10(2x - 1))) + 1 ; [0.5,1]
-    class ExponentialEaseInOut : public Tween
+    class ExponentialEaseInOut : public ITween
     {
         public:
 
@@ -317,7 +317,7 @@ namespace Urho3D
     };
 
     // Modeled after the damped sine wave y = sin(13pi/2*x)*pow(2, 10 * (x - 1))
-    class ElasticEaseIn : public Tween
+    class ElasticEaseIn : public ITween
     {
         public:
 
@@ -328,7 +328,7 @@ namespace Urho3D
     };
 
     // Modeled after the damped sine wave y = sin(-13pi/2*(x + 1))*pow(2, -10x) + 1
-    class ElasticEaseOut : public Tween
+    class ElasticEaseOut : public ITween
     {
         public:
 
@@ -341,7 +341,7 @@ namespace Urho3D
     // Modeled after the piecewise exponentially-damped sine wave:
     // y = (1/2)*sin(13pi/2*(2*x))*pow(2, 10 * ((2*x) - 1))      ; [0,0.5)
     // y = (1/2)*(sin(-13pi/2*((2x-1)+1))*pow(2,-10(2*x-1)) + 2) ; [0.5, 1]
-    class ElasticEaseInOut : public Tween
+    class ElasticEaseInOut : public ITween
     {
         public:
 
@@ -359,7 +359,7 @@ namespace Urho3D
     };
 
     // Modeled after the overshooting cubic y = x^3-x*sin(x*pi)
-    class BackEaseIn : public Tween
+    class BackEaseIn : public ITween
     {
         public:
 
@@ -370,7 +370,7 @@ namespace Urho3D
     };
 
     // Modeled after overshooting cubic y = 1-((1-x)^3-(1-x)*sin((1-x)*pi))
-    class BackEaseOut : public Tween
+    class BackEaseOut : public ITween
     {
         public:
 
@@ -384,7 +384,7 @@ namespace Urho3D
     // Modeled after the piecewise overshooting cubic function:
     // y = (1/2)*((2x)^3-(2x)*sin(2*x*pi))           ; [0, 0.5)
     // y = (1/2)*(1-((1-x)^3-(1-x)*sin((1-x)*pi))+1) ; [0.5, 1]
-    class BackEaseInOut : public Tween
+    class BackEaseInOut : public ITween
     {
         public:
 
@@ -403,7 +403,7 @@ namespace Urho3D
             }
     };
 
-    class BounceEaseOut : public Tween
+    class BounceEaseOut : public ITween
     {
         public:
 
@@ -428,7 +428,7 @@ namespace Urho3D
             }
     };
 
-    class BounceEaseIn : public Tween
+    class BounceEaseIn : public ITween
     {
         public:
 
@@ -439,7 +439,7 @@ namespace Urho3D
             }
     };
 
-    class BounceEaseInOut : public Tween
+    class BounceEaseInOut : public ITween
     {
         public:
 

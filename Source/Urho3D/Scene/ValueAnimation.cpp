@@ -335,7 +335,11 @@ void ValueAnimation::SetInterpolationMethod(InterpMethod method)
 
         case IM_CIRCULAR_IN:   tween_ = new CircularEaseIn(); break;
         case IM_CIRCULAR_OUT:  tween_ = new CircularEaseOut(); break;
-        case IM_CIRCULAR_NOUT: tween_ = new CircularEaseInOut(); break;
+        case IM_CIRCULAR_INOUT: tween_ = new CircularEaseInOut(); break;
+
+        case IM_SINE_IN:        tween_ = new SineEaseIn(); break;
+        case IM_SINE_OUT:       tween_ = new SineEaseOut(); break;
+        case IM_SINE_INOUT:     tween_ = new SineEaseInOut(); break;
 
         case IM_EXPO_IN:       tween_ = new ExponentialEaseIn(); break;
         case IM_EXPO_OUT:      tween_ = new ExponentialEaseOut(); break;
@@ -366,12 +370,21 @@ void ValueAnimation::SetSplineTension(float tension)
     splineTangentsDirty_ = true;
 }
 
-bool ValueAnimation::MoveKeyFrame( int id, float time )
+int ValueAnimation::MoveKeyFrame( int id, float time )
 {
+    // avoid replace other
+    for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+         if ( i != id && time == keyFrames_[i].time_)
+            return id;
+
     VAnimKeyFrame deletedKeyFrame = DeleteKeyFrame( id );
     if ( deletedKeyFrame.time_ != -NAN )
-        return SetKeyFrame( deletedKeyFrame.time_, deletedKeyFrame.value_ );
-    return false;
+        if( SetKeyFrame( time, deletedKeyFrame.value_ ) )
+            for (unsigned i = 0; i < keyFrames_.Size(); ++i)
+                 if ( time == keyFrames_[i].time_)
+                    return i;
+
+    return id;
 }
 
 bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
@@ -391,10 +404,12 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
     {
         for (unsigned i = 0; i < keyFrames_.Size(); ++i)
         {
-            // Guard against interpolation error caused by division by error due to 0 delta time between two key frames
             if (time == keyFrames_[i].time_)
-                return false;
-            if (time < keyFrames_[i].time_)
+            {
+                keyFrames_.At(i).value_ = value;
+                break;
+            }
+            else if (time < keyFrames_[i].time_)
             {
                 keyFrames_.Insert(i, keyFrame);
                 break;
@@ -402,8 +417,10 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
         }
     }
 
-    beginTime_ = Min(time, beginTime_);
-    endTime_ = Max(time, endTime_);
+    //beginTime_ = Min( time, beginTime_ );
+    //endTime_ = Max( time, endTime_ );
+    beginTime_ = keyFrames_.Front().time_;
+    endTime_ = keyFrames_.Back().time_;
     splineTangentsDirty_ = true;
 
     return true;
@@ -422,8 +439,8 @@ VAnimKeyFrame ValueAnimation::DeleteKeyFrame( int id )
             keyFrames_.Erase( id );
             if ( keyFrames_.Size() )
             {
-                beginTime_ = Min( keyFrames_.Front().time_, beginTime_);
-                endTime_ = Max( keyFrames_.Back().time_ , endTime_);
+                beginTime_ = keyFrames_.Front().time_;
+                endTime_ = keyFrames_.Back().time_;
             }
             splineTangentsDirty_ = true;
         }
@@ -461,8 +478,8 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
 bool ValueAnimation::IsValid() const
 {
     return (interpolationMethod_ == IM_NONE) ||
-           (interpolationMethod_ == IM_LINEAR && keyFrames_.Size() > 1) ||
-           (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2);
+           (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2 ||
+           (interpolationMethod_ != IM_NONE && keyFrames_.Size() > 1) );
 }
 
 Variant ValueAnimation::GetAnimationValue(float scaledTime)
