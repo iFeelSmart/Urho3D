@@ -67,6 +67,37 @@ static void RegisterValueAnimation(asIScriptEngine* engine)
     engine->RegisterEnumValue("InterpMethod", "IM_LINEAR", IM_LINEAR);
     engine->RegisterEnumValue("InterpMethod", "IM_SPLINE", IM_SPLINE);
 
+    engine->RegisterEnumValue("InterpMethod", "IM_QUAD_IN", IM_QUAD_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUAD_OUT", IM_QUAD_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUAD_INOUT", IM_QUAD_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_CUBIC_IN", IM_CUBIC_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_CUBIC_OUT", IM_CUBIC_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_CUBIC_INOUT", IM_CUBIC_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUART_IN", IM_QUART_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUART_OUT", IM_QUART_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUART_INOUT", IM_QUART_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUINT_IN", IM_QUINT_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUINT_OUT", IM_QUINT_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_QUINT_INOUT", IM_QUINT_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_CIRCULAR_IN", IM_CIRCULAR_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_CIRCULAR_OUT", IM_CIRCULAR_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_CIRCULAR_INOUT", IM_CIRCULAR_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_SINE_IN", IM_SINE_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_SINE_OUT", IM_SINE_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_SINE_INOUT", IM_SINE_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_EXPO_IN", IM_EXPO_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_EXPO_OUT", IM_EXPO_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_EXPO_INOUT", IM_EXPO_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_ELASTIC_IN", IM_ELASTIC_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_ELASTIC_OUT", IM_ELASTIC_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_ELASTIC_INOUT", IM_ELASTIC_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_BACK_IN", IM_BACK_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_BACK_OUT", IM_BACK_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_BACK_INOUT", IM_BACK_INOUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_BOUNCE_IN", IM_BOUNCE_IN);
+    engine->RegisterEnumValue("InterpMethod", "IM_BOUNCE_OUT", IM_BOUNCE_OUT);
+    engine->RegisterEnumValue("InterpMethod", "IM_BOUNCE_INOUT", IM_BOUNCE_INOUT);
+
     RegisterResource<ValueAnimation>(engine, "ValueAnimation");
     engine->RegisterObjectMethod("ValueAnimation", "void set_interpolationMethod(InterpMethod)", asMETHOD(ValueAnimation, SetInterpolationMethod), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "InterpMethod get_interpolationMethod() const", asMETHOD(ValueAnimation, GetInterpolationMethod), asCALL_THISCALL);

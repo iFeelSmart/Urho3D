@@ -65,7 +65,7 @@ bool ObjectAnimationPool::Save(Serializer& dest) const
     if (!SaveXML(rootElem))
         return false;
 
-    return xmlFile.Save(dest);
+    return xmlFile.Save( dest );
 }
 
 bool ObjectAnimationPool::LoadXML(const XMLElement& source)
@@ -73,7 +73,7 @@ bool ObjectAnimationPool::LoadXML(const XMLElement& source)
     objectAnimations_.Clear();
 
     XMLElement animEntryElem;
-    animEntryElem = source.GetChild("objectanimationentry");
+    animEntryElem = source.GetChild("objectanimation");
     while (animEntryElem)
     {
         String name = animEntryElem.GetAttribute("name");
@@ -82,7 +82,7 @@ bool ObjectAnimationPool::LoadXML(const XMLElement& source)
         if (!objectAnimation->LoadXML(animEntryElem))
             return false;
 
-        animEntryElem = animEntryElem.GetNext("objectanimationentry");
+        animEntryElem = animEntryElem.GetNext("objectanimation");
         AddObjectAnimation( name, objectAnimation );
     }
 
@@ -94,7 +94,7 @@ bool ObjectAnimationPool::SaveXML(XMLElement& dest) const
     for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = objectAnimations_.Begin();
          i != objectAnimations_.End(); ++i)
     {
-        XMLElement animEntryElem = dest.CreateChild("objectanimationentry");
+        XMLElement animEntryElem = dest.CreateChild("objectanimation");
         animEntryElem.SetAttribute("name", i->first_);
 
         const ObjectAnimation* anim = i->second_;

@@ -72,7 +72,7 @@ Animatable::~Animatable() = default;
 void Animatable::RegisterObject(Context* context)
 {
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation Pool", GetObjectAnimationPoolAttr, SetObjectAnimationPoolAttr, ResourceRef,
-        ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
+        ResourceRef(ObjectAnimationPool::GetTypeStatic()), AM_DEFAULT);
     URHO3D_MIXED_ACCESSOR_ATTRIBUTE("Object Animation", GetObjectAnimationAttr, SetObjectAnimationAttr, ResourceRef,
         ResourceRef(ObjectAnimation::GetTypeStatic()), AM_DEFAULT);
 }
