@@ -26,6 +26,7 @@
 #include "../Graphics/DebugRenderer.h"
 #include "../IO/PackageFile.h"
 #include "../Scene/ObjectAnimation.h"
+#include "../Scene/ObjectAnimationPool.h"
 #include "../Scene/Scene.h"
 #include "../Scene/SmoothedTransform.h"
 #include "../Scene/SplinePath.h"
@@ -126,8 +127,12 @@ static void RegisterObjectAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ObjectAnimation", "Variant get_attributeAnimations(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimation), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "Variant get_wrapModes(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationWrapMode), asCALL_THISCALL);
     engine->RegisterObjectMethod("ObjectAnimation", "Variant get_speeds(const String&in) const", asMETHOD(ObjectAnimation, GetAttributeAnimationSpeed), asCALL_THISCALL);
-}
 
+    RegisterResource<ObjectAnimation>(engine, "ObjectAnimationPool");
+    engine->RegisterObjectMethod("ObjectAnimation", "void AddObjectAnimation(const String&name, ObjectAnimation@+)", asMETHOD(ObjectAnimationPool, AddObjectAnimation), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "void RemoveObjectAnimation(const String&name)", asMETHODPR(ObjectAnimationPool, RemoveObjectAnimation, (const String&), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ObjectAnimation", "ObjectAnimation@+ GetObjectAnimation(const String&name) const", asMETHOD(ObjectAnimationPool, GetObjectAnimation), asCALL_THISCALL);
+}
 
 static void RegisterAnimatable(asIScriptEngine* engine)
 {

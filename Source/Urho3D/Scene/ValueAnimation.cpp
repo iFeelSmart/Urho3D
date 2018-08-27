@@ -520,12 +520,13 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     const VAnimKeyFrame& keyFrame1 = keyFrames_[index1];
     const VAnimKeyFrame& keyFrame2 = keyFrames_[index2];
 
-    float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
-
+    // TWEEN ADDON BASED ON LINEAR
     if( interpolationMethod_ != IM_LINEAR && tween_.Get() )
     {
         scaledTime = (*tween_)( scaledTime );
     }
+
+    float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
 
     const Variant& value1 = keyFrame1.value_;
     const Variant& value2 = keyFrame2.value_;
