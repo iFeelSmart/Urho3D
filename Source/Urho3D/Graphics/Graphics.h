@@ -93,12 +93,7 @@ class URHO3D_API Graphics : public Object
 public:
 
     /// Construct.
-<<<<<<< HEAD
     explicit Graphics(Context* context, bool bUseExternalGLContext = false);
-
-=======
-    Graphics( Context* context, bool bUseExternalGLContext );
->>>>>>> Replace get FBO function pointer by an instanced class
     /// Destruct. Release the Direct3D11 device and close the window.
     ~Graphics() override;
 

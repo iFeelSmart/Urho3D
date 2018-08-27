@@ -144,18 +144,15 @@ public:
 	void ClearKeyFrames();
     /// Set key frame.
     bool SetKeyFrame(float time, const Variant& value);
+    /// Move key frame. return new id
+    int MoveKeyFrame( int id, float time );
+    /// Delete key frame.
+    VAnimKeyFrame DeleteKeyFrame( int id );
     /// Set event frame.
     void SetEventFrame(float time, const StringHash& eventType, const VariantMap& eventData = VariantMap());
 
     /// Return animation is valid.
     bool IsValid() const;
-
-	/// Set key frame.
-	bool SetKeyFrame(float time, const Variant& value);
-    /// Move key frame. return new id
-    int MoveKeyFrame( int id, float time );
-    /// Delete key frame.
-    VAnimKeyFrame DeleteKeyFrame( int id );
 
     /// Return owner.
     void* GetOwner() const { return owner_; }

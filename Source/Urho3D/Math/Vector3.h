@@ -204,7 +204,7 @@ public:
     }
 
     /// Construct from a two-dimensional vector (for Urho2D).
-    explicit Vector3(const Vector2& vector) noexcept :
+    Vector3(const Vector2& vector) noexcept :
         x_(vector.x_),
         y_(vector.y_),
         z_(0.0f)
@@ -212,7 +212,7 @@ public:
     }
 
     /// Construct from an IntVector3.
-    explicit Vector3(const IntVector3& vector) noexcept :
+    Vector3(const IntVector3& vector) noexcept :
         x_((float)vector.x_),
         y_((float)vector.y_),
         z_((float)vector.z_)
