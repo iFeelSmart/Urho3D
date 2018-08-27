@@ -92,7 +92,7 @@ public:
     /// Remove object animation pool. Same as calling SetObjectAnimationPool with a null pointer.
     void RemoveObjectAnimationPool();
     /// Play Animation from pool name 
-    void SetAnimation(const String& name);
+    void PlayAnimation(const String& name);
     /// Get Animation name from pool
     String GetAnimation() const;
 

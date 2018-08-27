@@ -337,7 +337,7 @@ void Animatable::SetAnimationTime(float time)
     }
 }
 
-void Animatable::SetAnimation( const String& name )
+void Animatable::PlayAnimation( const String& name )
 {
     if ( !objectAnimationPool_ )
         objectAnimationPool_ = new ObjectAnimationPool( context_ );

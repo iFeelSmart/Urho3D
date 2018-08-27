@@ -128,7 +128,7 @@ void ValueAnimationInfo::ApplyValue(const Variant& newValue)
 float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const
 {
     float beginTime = animation_->GetBeginTime();
-    float endTime = animation_->GetEndTime();
+    float endTime = animation_->GetEndTime() + URHO3D_ANIMATION_BIAS;
 
     switch (wrapMode_)
     {

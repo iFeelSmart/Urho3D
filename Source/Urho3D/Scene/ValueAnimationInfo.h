@@ -27,6 +27,8 @@
 #include "../Container/Vector.h"
 #include "../Scene/AnimationDefs.h"
 
+#define URHO3D_ANIMATION_BIAS 1/100.f
+
 namespace Urho3D
 {
 

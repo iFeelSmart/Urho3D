@@ -499,6 +499,11 @@ template <class T> void RegisterAnimatable(asIScriptEngine* engine, const char* 
     engine->RegisterObjectMethod(className, "void SetAnimationTime(float time)", asMETHODPR(T, SetAnimationTime, (float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "void SetAttributeAnimationTime(const String&in, float)", asMETHODPR(T, SetAttributeAnimationTime, (const String&, float), void), asCALL_THISCALL);
     engine->RegisterObjectMethod(className, "float GetAttributeAnimationTime(const String&in) const", asMETHODPR(T, GetAttributeAnimationTime, (const String&) const, float), asCALL_THISCALL);
+
+    engine->RegisterObjectMethod(className, "void set_objectAnimationPool(ObjectAnimationPool@+)", asMETHODPR(T, SetObjectAnimationPool, (ObjectAnimationPool*), void), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "ObjectAnimationPool@+ get_objectAnimationPool() const", asMETHODPR(T, GetObjectAnimationPool, () const, ObjectAnimationPool*), asCALL_THISCALL);
+    engine->RegisterObjectMethod(className, "void PlayAnimation(const String&name)", asMETHODPR(T, PlayAnimation, (const String&), void), asCALL_THISCALL);
+
 }
 
 /// Template function for registering a class derived from Component.
