@@ -79,6 +79,9 @@ public:
 protected:
     /// Apply new animation value to the target object. Called by Update().
     virtual void ApplyValue(const Variant& newValue);
+    /// Get current value from the target object. Called by Update().
+    virtual Variant GetCurrentValue() const;
+
     /// Calculate scaled time.
     float CalculateScaledTime(float currentTime, bool& finished) const;
     /// Return event frames.

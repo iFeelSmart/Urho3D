@@ -175,7 +175,7 @@ public:
 	float GetEndTime() const { return endTime_; }
 
 	/// Return animation value.
-	Variant GetAnimationValue(float scaledTime);
+    Variant GetAnimationValue(float scaledTime, const Variant& currentValue = Variant() );
 
 	/// Return all key frames.
     const Vector<VAnimKeyFrame>& GetKeyFrames() const { return keyFrames_; }
@@ -188,9 +188,9 @@ public:
 
 protected:
 	/// Linear interpolation.
-	Variant LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const;
+    Variant LinearInterpolation(unsigned index1, unsigned index2, float scaledTime, const Variant &currentValue) const;
 	/// Spline interpolation.
-	Variant SplineInterpolation(unsigned index1, unsigned index2, float scaledTime);
+    Variant SplineInterpolation(unsigned index1, unsigned index2, float scaledTime, const Variant &currentValue);
 	/// Update spline tangents.
 	void UpdateSplineTangents();
 	/// Return (value1 - value2) * t.
@@ -220,6 +220,8 @@ protected:
 	bool splineTangentsDirty_;
 	/// Event frames.
 	Vector<VAnimEventFrame> eventFrames_;
+    /// Phantom key used if invalid keyframe.value_ from current attrib value
+    VAnimKeyFrame phantomKey_;
 };
 
 }

@@ -90,7 +90,7 @@ bool ValueAnimationInfo::SetTime(float time)
     float scaledTime = CalculateScaledTime(currentTime_, finished);
 
     // Apply to the target object
-    ApplyValue(animation_->GetAnimationValue(scaledTime));
+    ApplyValue(animation_->GetAnimationValue(scaledTime, GetCurrentValue()));
 
     // Send keyframe event if necessary
     if (animation_->HasEventFrames())
@@ -124,6 +124,10 @@ Object* ValueAnimationInfo::GetTarget() const
 }
 
 void ValueAnimationInfo::ApplyValue(const Variant& newValue)
+{
+}
+
+Variant ValueAnimationInfo::GetCurrentValue() const
 {
 }
 

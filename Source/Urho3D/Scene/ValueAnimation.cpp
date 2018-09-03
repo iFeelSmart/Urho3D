@@ -391,7 +391,7 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
 {
     if (valueType_ == VAR_NONE)
         SetValueType(value.GetType());
-    else if (value.GetType() != valueType_)
+    else if (value.GetType() != valueType_ && value.GetType() != VAR_NONE ) // phantom key update case
         return false;
 
     VAnimKeyFrame keyFrame;
@@ -478,17 +478,36 @@ void ValueAnimation::SetEventFrame(float time, const StringHash& eventType, cons
 bool ValueAnimation::IsValid() const
 {
     return (interpolationMethod_ == IM_NONE) ||
-           (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2 ||
-           (interpolationMethod_ != IM_NONE && keyFrames_.Size() > 1) );
+           (interpolationMethod_ == IM_SPLINE && keyFrames_.Size() > 2 ) ||
+           (interpolationMethod_ != IM_NONE && interpolationMethod_ != IM_SPLINE && keyFrames_.Size() > 1);
 }
 
-Variant ValueAnimation::GetAnimationValue(float scaledTime)
+Variant ValueAnimation::GetAnimationValue(float scaledTime, const Variant &currentValue )
 {
     unsigned index = 1;
     for (; index < keyFrames_.Size(); ++index)
     {
         if (scaledTime < keyFrames_[index].time_)
+        {
+            const VAnimKeyFrame& prev = keyFrames_[index-1];
+            if( prev.value_.IsEmpty() && phantomKey_.time_ != prev.time_ )
+            {
+                phantomKey_ = keyFrames_[index-1];
+                phantomKey_.value_ = currentValue;
+            }
+            else if( !prev.value_.IsEmpty() )
+            {
+                phantomKey_.time_ = -NAN;
+                phantomKey_.value_ = Variant();
+            }
             break;
+        }
+        else if( index == keyFrames_.Size() - 1 )
+        {
+            // reset phantom
+            phantomKey_.time_ = -NAN;
+            phantomKey_.value_ = Variant();
+        }
     }
 
     if (index >= keyFrames_.Size() || !interpolatable_ || interpolationMethod_ == IM_NONE)
@@ -496,9 +515,9 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime)
     else
     {
         if (interpolationMethod_ == IM_SPLINE)
-            return SplineInterpolation(index - 1, index, scaledTime);
+            return SplineInterpolation(index - 1, index, scaledTime, currentValue);
         else
-            return LinearInterpolation(index - 1, index, scaledTime);
+            return LinearInterpolation(index - 1, index, scaledTime, currentValue);
     }
 }
 
@@ -515,7 +534,7 @@ void ValueAnimation::GetEventFrames(float beginTime, float endTime, PODVector<co
     }
 }
 
-Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, float scaledTime) const
+Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, float scaledTime, const Variant &currentValue) const
 {
     const VAnimKeyFrame& keyFrame1 = keyFrames_[index1];
     const VAnimKeyFrame& keyFrame2 = keyFrames_[index2];
@@ -528,7 +547,9 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
 
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
 
-    const Variant& value1 = keyFrame1.value_;
+    Variant value1 = keyFrame1.value_;
+    if( value1.IsEmpty() ) value1 = phantomKey_.value_;
+
     const Variant& value2 = keyFrame2.value_;
 
     switch (valueType_)
@@ -596,7 +617,7 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     }
 }
 
-Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime)
+Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, float scaledTime, const Variant &currentValue)
 {
     if (splineTangentsDirty_)
         UpdateSplineTangents();
@@ -614,7 +635,9 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
     float h3 = ttt - 2.0f * tt + t;
     float h4 = ttt - tt;
 
-    const Variant& v1 = keyFrame1.value_;
+    Variant v1 = keyFrame1.value_;
+    if( v1.IsEmpty() ) v1 = phantomKey_.value_;
+
     const Variant& v2 = keyFrame2.value_;
     const Variant& t1 = splineTangents_[index1];
     const Variant& t2 = splineTangents_[index2];

@@ -67,6 +67,16 @@ void AttributeAnimationInfo::ApplyValue(const Variant& newValue)
     }
 }
 
+Variant AttributeAnimationInfo::GetCurrentValue() const
+{
+    Animatable* animatable = static_cast<Animatable*>(target_.Get());
+    if (animatable)
+    {
+        return animatable->GetAttribute( attributeInfo_.name_ );
+    }
+    return Variant();
+}
+
 Animatable::Animatable(Context* context) :
     Serializable(context),
     animationEnabled_(true)

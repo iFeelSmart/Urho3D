@@ -54,6 +54,7 @@ public:
 protected:
     /// Apply new animation value to the target object. Called by Update().
     virtual void ApplyValue(const Variant& newValue) override;
+    virtual Variant GetCurrentValue() const override;
 
 private:
     /// Attribute information.
