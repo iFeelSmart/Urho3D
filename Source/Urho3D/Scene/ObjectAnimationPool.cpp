@@ -82,8 +82,8 @@ bool ObjectAnimationPool::LoadXML(const XMLElement& source)
         if (!objectAnimation->LoadXML(animEntryElem))
             return false;
 
-        animEntryElem = animEntryElem.GetNext("objectanimation");
         AddObjectAnimation( name, objectAnimation );
+        animEntryElem = animEntryElem.GetNext("objectanimation");
     }
 
     return true;
@@ -94,12 +94,15 @@ bool ObjectAnimationPool::SaveXML(XMLElement& dest) const
     for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = objectAnimations_.Begin();
          i != objectAnimations_.End(); ++i)
     {
-        XMLElement animEntryElem = dest.CreateChild("objectanimation");
-        animEntryElem.SetAttribute("name", i->first_);
+        if( !i->first_.Empty() )
+        {
+            XMLElement animEntryElem = dest.CreateChild("objectanimation");
+            animEntryElem.SetAttribute("name", i->first_);
 
-        const ObjectAnimation* anim = i->second_;
-        if (!anim->SaveXML(animEntryElem))
-            return false;
+            const ObjectAnimation* anim = i->second_;
+            if (!anim->SaveXML(animEntryElem))
+                return false;
+        }
     }
 
     return true;
@@ -138,14 +141,17 @@ bool ObjectAnimationPool::SaveJSON(JSONValue& dest) const
     for (HashMap<String, SharedPtr<ObjectAnimation> >::ConstIterator i = objectAnimations_.Begin();
          i != objectAnimations_.End(); ++i)
     {
-        JSONValue animEntryValue;
-        animEntryValue.Set("name", i->first_);
+        if( !i->first_.Empty() )
+        {
+            JSONValue animEntryValue;
+            animEntryValue.Set("name", i->first_);
 
-        const ObjectAnimation* objectAnimation = i->second_;
-        if (!objectAnimation->SaveJSON(animEntryValue))
-            return false;
+            const ObjectAnimation* objectAnimation = i->second_;
+            if (!objectAnimation->SaveJSON(animEntryValue))
+                return false;
 
-        objectAnimationsValue.Set(i->first_, animEntryValue);
+            objectAnimationsValue.Set(i->first_, animEntryValue);
+        }
     }
 
     dest.Set("objectanimationpool", objectAnimationsValue);

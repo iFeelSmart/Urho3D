@@ -102,16 +102,21 @@ bool Animatable::LoadXML(const XMLElement& source, bool setInstanceDefault)
             return false;
 
         SetObjectAnimationPool(objectAnimationPool);
+
+        String default_anim = elem.GetAttribute("default");
+        SetObjectAnimation( objectAnimationPool->GetObjectAnimation( default_anim ) );
     }
-
-    elem = source.GetChild("objectanimation");
-    if (elem)
+    else
     {
-        SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
-        if (!objectAnimation->LoadXML(elem))
-            return false;
+        elem = source.GetChild("objectanimation");
+        if (elem)
+        {
+            SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
+            if (!objectAnimation->LoadXML(elem))
+                return false;
 
-        SetObjectAnimation(objectAnimation);
+            SetObjectAnimation(objectAnimation);
+        }
     }
 
     elem = source.GetChild("attributeanimation");
@@ -159,20 +164,24 @@ bool Animatable::LoadJSON(const JSONValue& source, bool setInstanceDefault)
             return false;
 
         SetObjectAnimationPool(objectAnimationPool);
+
+        String default_anim = value.Get("default").GetString();;
+        SetObjectAnimation( objectAnimationPool->GetObjectAnimation( default_anim ) );
     }
-
-    value = source.Get("objectanimation");
-    if (!value.IsNull())
+    else
     {
-        SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
-        if (!objectAnimation->LoadJSON(value))
-            return false;
+        value = source.Get("objectanimation");
+        if (!value.IsNull())
+        {
+            SharedPtr<ObjectAnimation> objectAnimation(new ObjectAnimation(context_));
+            if (!objectAnimation->LoadJSON(value))
+                return false;
 
-        SetObjectAnimation(objectAnimation);
+            SetObjectAnimation(objectAnimation);
+        }
     }
 
     JSONValue attributeAnimationValue = source.Get("attributeanimation");
-
     if (attributeAnimationValue.IsNull())
         return true;
 
@@ -220,18 +229,20 @@ bool Animatable::SaveXML(XMLElement& dest) const
     if (objectAnimationPool_ && objectAnimationPool_->GetName().Empty())
     {
         XMLElement elem = dest.CreateChild("objectanimationpool");
+        elem.SetAttribute("default", GetAnimation() );
         if (!objectAnimationPool_->SaveXML(elem))
             return false;
     }
-
-    // Object animation without name
-    if (objectAnimation_ && objectAnimation_->GetName().Empty())
+    else
     {
-        XMLElement elem = dest.CreateChild("objectanimation");
-        if (!objectAnimation_->SaveXML(elem))
-            return false;
+        // Object animation without name
+        if (objectAnimation_ && objectAnimation_->GetName().Empty())
+        {
+            XMLElement elem = dest.CreateChild("objectanimation");
+            if (!objectAnimation_->SaveXML(elem))
+                return false;
+        }
     }
-
 
     for (HashMap<String, SharedPtr<AttributeAnimationInfo> >::ConstIterator i = attributeAnimationInfos_.Begin();
          i != attributeAnimationInfos_.End(); ++i)
@@ -265,15 +276,18 @@ bool Animatable::SaveJSON(JSONValue& dest) const
         if (!objectAnimationPool_->SaveJSON(objectAnimationPoolValue))
             return false;
         dest.Set("objectanimationpool", objectAnimationPoolValue);
+        objectAnimationPoolValue.Set("default", GetAnimation() );
     }
-
-    // Object animation without name
-    if (objectAnimation_ && objectAnimation_->GetName().Empty())
+    else
     {
-        JSONValue objectAnimationValue;
-        if (!objectAnimation_->SaveJSON(objectAnimationValue))
-            return false;
-        dest.Set("objectanimation", objectAnimationValue);
+        // Object animation without name
+        if (objectAnimation_ && objectAnimation_->GetName().Empty())
+        {
+            JSONValue objectAnimationValue;
+            if (!objectAnimation_->SaveJSON(objectAnimationValue))
+                return false;
+            dest.Set("objectanimation", objectAnimationValue);
+        }
     }
 
     JSONValue attributeAnimationValue;
