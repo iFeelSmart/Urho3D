@@ -129,6 +129,7 @@ void ValueAnimationInfo::ApplyValue(const Variant& newValue)
 
 Variant ValueAnimationInfo::GetCurrentValue() const
 {
+    return Variant();
 }
 
 float ValueAnimationInfo::CalculateScaledTime(float currentTime, bool& finished) const

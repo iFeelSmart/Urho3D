@@ -99,6 +99,8 @@ ValueAnimation::ValueAnimation(Context* context) :
     endTime_(-M_INFINITY),
     splineTangentsDirty_(false)
 {
+    phantomKey_.time_ = -NAN;
+    phantomKey_.value_ = Variant();
 }
 
 ValueAnimation::~ValueAnimation()
@@ -387,7 +389,7 @@ int ValueAnimation::MoveKeyFrame( int id, float time )
     return id;
 }
 
-bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
+bool ValueAnimation::SetKeyFrame(float time, const Variant& value, bool phantom)
 {
     if (valueType_ == VAR_NONE)
         SetValueType(value.GetType());
@@ -396,7 +398,7 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value)
 
     VAnimKeyFrame keyFrame;
     keyFrame.time_ = time;
-    keyFrame.value_ = value;
+    keyFrame.value_ = !phantom ? value : Variant();
 
     if (keyFrames_.Empty() || time > keyFrames_.Back().time_)
         keyFrames_.Push(keyFrame);
@@ -497,6 +499,7 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime, const Variant &curre
             }
             else if( !prev.value_.IsEmpty() )
             {
+                // reset phantom
                 phantomKey_.time_ = -NAN;
                 phantomKey_.value_ = Variant();
             }
@@ -548,7 +551,8 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     float t = (scaledTime - keyFrame1.time_) / (keyFrame2.time_ - keyFrame1.time_);
 
     Variant value1 = keyFrame1.value_;
-    if( value1.IsEmpty() ) value1 = phantomKey_.value_;
+    if( value1.IsEmpty() && !phantomKey_.value_.IsEmpty() )
+        value1 = phantomKey_.value_;
 
     const Variant& value2 = keyFrame2.value_;
 
@@ -636,7 +640,8 @@ Variant ValueAnimation::SplineInterpolation(unsigned index1, unsigned index2, fl
     float h4 = ttt - tt;
 
     Variant v1 = keyFrame1.value_;
-    if( v1.IsEmpty() ) v1 = phantomKey_.value_;
+    if( v1.IsEmpty() && !phantomKey_.value_.IsEmpty() )
+        v1 = phantomKey_.value_;
 
     const Variant& v2 = keyFrame2.value_;
     const Variant& t1 = splineTangents_[index1];

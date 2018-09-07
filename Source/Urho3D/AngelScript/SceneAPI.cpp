@@ -106,7 +106,7 @@ static void RegisterValueAnimation(asIScriptEngine* engine)
     engine->RegisterObjectMethod("ValueAnimation", "float get_splineTension() const", asMETHOD(ValueAnimation, GetSplineTension), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "void set_valueType(VariantType)", asMETHOD(ValueAnimation, SetValueType), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "VariantType get_valueType() const", asMETHOD(ValueAnimation, GetValueType), asCALL_THISCALL);
-    engine->RegisterObjectMethod("ValueAnimation", "void SetKeyFrame(float, const Variant&in)", asMETHOD(ValueAnimation, SetKeyFrame), asCALL_THISCALL);
+    engine->RegisterObjectMethod("ValueAnimation", "void SetKeyFrame(float, const Variant&in, bool phantom = false)", asMETHOD(ValueAnimation, SetKeyFrame), asCALL_THISCALL);
     engine->RegisterObjectMethod("ValueAnimation", "void SetEventFrame(float, const String&in, const VariantMap&in eventData = VariantMap())", asFUNCTION(ValueAnimationSetEventFrame), asCALL_CDECL_OBJLAST);
 }
 

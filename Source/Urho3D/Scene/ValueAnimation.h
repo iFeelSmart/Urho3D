@@ -144,7 +144,7 @@ public:
 	void ClearKeyFrames();
 
 	/// Set key frame.
-	bool SetKeyFrame(float time, const Variant& value);
+    bool SetKeyFrame(float time, const Variant& value, bool phantom = false);
     /// Move key frame. return new id
     int MoveKeyFrame( int id, float time );
     /// Delete key frame.
