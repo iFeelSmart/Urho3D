@@ -91,6 +91,8 @@ void Node::RegisterObject(Context* context)
         AM_NET | AM_LATESTDATA | AM_NOEDIT);
     URHO3D_ACCESSOR_ATTRIBUTE("Network Parent Node", GetNetParentAttr, SetNetParentAttr, PODVector<unsigned char>, Variant::emptyBuffer,
         AM_NET | AM_NOEDIT);
+
+    URHO3D_COPY_BASE_ATTRIBUTE( Animatable, "Object Animation Pool");
 }
 
 bool Node::Load(Deserializer& source, bool setInstanceDefault)

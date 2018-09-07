@@ -109,6 +109,8 @@ public:
 
     /// Copy base class attributes to derived class.
     void CopyBaseAttributes(StringHash baseType, StringHash derivedType);
+    /// Copy base class attribute to derived class by name.
+    void CopyBaseAttribute(StringHash baseType, StringHash derivedType, const char* name);
     /// Template version of registering an object factory.
     template <class T> void RegisterFactory();
     /// Template version of registering an object factory with category.
@@ -121,6 +123,8 @@ public:
     template <class T> void RemoveAttribute(const char* name);
     /// Template version of copying base class attributes to derived class.
     template <class T, class U> void CopyBaseAttributes();
+    /// Template version of copying base class attribute to derived class by name.
+    template <class T, class U> void CopyBaseAttribute( const char* name );
     /// Template version of updating an object attribute's default value.
     template <class T> void UpdateAttributeDefaultValue(const char* name, const Variant& defaultValue);
 
@@ -254,6 +258,8 @@ template <class T> AttributeHandle Context::RegisterAttribute(const AttributeInf
 template <class T> void Context::RemoveAttribute(const char* name) { RemoveAttribute(T::GetTypeStatic(), name); }
 
 template <class T, class U> void Context::CopyBaseAttributes() { CopyBaseAttributes(T::GetTypeStatic(), U::GetTypeStatic()); }
+
+template <class T, class U> void Context::CopyBaseAttribute(const char* name) { CopyBaseAttribute(T::GetTypeStatic(), U::GetTypeStatic(), name); }
 
 template <class T> T* Context::GetSubsystem() const { return static_cast<T*>(GetSubsystem(T::GetTypeStatic())); }
 

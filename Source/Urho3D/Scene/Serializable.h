@@ -352,6 +352,8 @@ namespace AttributeMetadata
 
 /// Copy attributes from a base class.
 #define URHO3D_COPY_BASE_ATTRIBUTES(sourceClassName) context->CopyBaseAttributes<sourceClassName, ClassName>()
+/// Copy attributes from a base class.
+#define URHO3D_COPY_BASE_ATTRIBUTE(sourceClassName, name) context->CopyBaseAttribute<sourceClassName, ClassName>(name)
 /// Remove attribute by name.
 #define URHO3D_REMOVE_ATTRIBUTE(name) context->RemoveAttribute<ClassName>(name)
 /// Define an attribute that points to a memory offset in the object.

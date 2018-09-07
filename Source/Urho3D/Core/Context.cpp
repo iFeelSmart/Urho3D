@@ -351,6 +351,32 @@ void Context::CopyBaseAttributes(StringHash baseType, StringHash derivedType)
     }
 }
 
+void Context::CopyBaseAttribute(StringHash baseType, StringHash derivedType, const char* name)
+{
+    // Prevent endless loop if mistakenly copying attributes from same class as derived
+    if (baseType == derivedType)
+    {
+        URHO3D_LOGWARNING("Attempt to copy base attributes to itself for class " + GetTypeName(baseType));
+        return;
+    }
+
+    const Vector<AttributeInfo>* baseAttributes = GetAttributes(baseType);
+    if (baseAttributes)
+    {
+        for (unsigned i = 0; i < baseAttributes->Size(); ++i)
+        {
+            const AttributeInfo& attr = baseAttributes->At(i);
+            if ( attr.name_ == String(name) )
+            {
+                attributes_[derivedType].Push(attr);
+                if (attr.mode_ & AM_NET)
+                    networkAttributes_[derivedType].Push(attr);
+                break;
+            }
+        }
+    }
+}
+
 Object* Context::GetSubsystem(StringHash type) const
 {
     HashMap<StringHash, SharedPtr<Object> >::ConstIterator i = subsystems_.Find(type);
