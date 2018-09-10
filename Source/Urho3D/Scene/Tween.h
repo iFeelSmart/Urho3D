@@ -1,5 +1,6 @@
 #pragma once
 
+#include "../IO/Log.h"
 #include <../Math/MathDefs.h>
 #include <../Container/RefCounted.h>
 
@@ -203,7 +204,7 @@ namespace Urho3D
 
             virtual float operator()( float fParam )
             {
-                return Urho3D::Sin((fParam - 1.f) * Urho3D::M_HALF_PI) + 1.f;
+                return sin((fParam - 1.f) * Urho3D::M_HALF_PI) + 1.f;
             }
     };
 
@@ -214,7 +215,7 @@ namespace Urho3D
 
             virtual float operator()( float fParam )
             {
-                return Urho3D::Sin(fParam * Urho3D::M_HALF_PI);
+                return sin(fParam * Urho3D::M_HALF_PI);
             }
     };
 
@@ -225,7 +226,7 @@ namespace Urho3D
 
             virtual float operator()( float fParam )
             {
-                return 0.5f * (1.f - Urho3D::Cos(fParam * Urho3D::M_PI));
+                return 0.5f * (1.f - cos(fParam * Urho3D::M_PI));
             }
     };
 
@@ -349,11 +350,11 @@ namespace Urho3D
             {
                 if(fParam < 0.5f)
                 {
-                    return 0.5f * Urho3D::Sin(13.f * Urho3D::M_HALF_PI * (2.f * fParam)) * Urho3D::Pow(2.f, 10.f * ((2.f * fParam) - 1.f));
+                    return 0.5f * sin(13.f * Urho3D::M_HALF_PI * (2.f * fParam)) * Urho3D::Pow(2.f, 10.f * ((2.f * fParam) - 1.f));
                 }
                 else
                 {
-                    return 0.5f * (Urho3D::Sin(-13.f * Urho3D::M_HALF_PI * ((2.f * fParam - 1.f) + 1.f)) * Urho3D::Pow(2.f, -10.f * (2.f * fParam - 1.f)) + 2.f);
+                    return 0.5f * (sin(-13.f * Urho3D::M_HALF_PI * ((2.f * fParam - 1.f) + 1.f)) * Urho3D::Pow(2.f, -10.f * (2.f * fParam - 1.f)) + 2.f);
                 }
             }
     };
@@ -365,7 +366,7 @@ namespace Urho3D
 
             virtual float operator()( float fParam )
             {
-                return fParam * fParam * fParam - fParam * Urho3D::Sin(fParam * Urho3D::M_PI);
+                return fParam * fParam * fParam - fParam * sin(fParam * Urho3D::M_PI);
             }
     };
 
@@ -377,7 +378,7 @@ namespace Urho3D
             virtual float operator()( float fParam )
             {
                 float f = (1.f - fParam);
-                return 1.f - (f * f * f - f * Urho3D::Sin(f * Urho3D::M_PI));
+                return 1.f - (f * f * f - f * sin(f * Urho3D::M_PI));
             }
     };
 
@@ -393,12 +394,12 @@ namespace Urho3D
                 if(fParam < 0.5f)
                 {
                     float f = 2.f * fParam;
-                    return 0.5f * (f * f * f - f * Urho3D::Sin(f * Urho3D::M_PI));
+                    return 0.5f * (f * f * f - f * sin(f * Urho3D::M_PI));
                 }
                 else
                 {
                     float f = (1.f - (2.f*fParam - 1.f));
-                    return 0.5f * (1.f - (f * f * f - f * Urho3D::Sin(f * Urho3D::M_PI))) + 0.5f;
+                    return 0.5f * (1.f - (f * f * f - f * sin(f * Urho3D::M_PI))) + 0.5f;
                 }
             }
     };
