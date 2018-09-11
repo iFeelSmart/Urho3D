@@ -547,9 +547,7 @@ Variant ValueAnimation::LinearInterpolation(unsigned index1, unsigned index2, fl
     // TWEEN ADDON BASED ON LINEAR
     if( interpolationMethod_ != IM_LINEAR && tween_.Get() )
     {
-        float t2 = (*tween_)( t );
-        URHO3D_LOGERROR(String((unsigned long)this) + " t:" + String(t) + " -> t:" + String(t2));
-        t = t2;
+        t = (*tween_)( t );
     }
 
     Variant value1 = keyFrame1.value_;
