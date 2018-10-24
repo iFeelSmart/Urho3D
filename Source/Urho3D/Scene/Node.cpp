@@ -57,6 +57,7 @@ Node::Node(Context* context) :
     id_(0),
     position_(Vector3::ZERO),
     rotation_(Quaternion::IDENTITY),
+    rotationEuler_(Vector3::ZERO),
     scale_(Vector3::ONE),
     worldRotation_(Quaternion::IDENTITY)
 {
@@ -83,6 +84,7 @@ void Node::RegisterObject(Context* context)
     URHO3D_ACCESSOR_ATTRIBUTE("Tags", GetTags, SetTags, StringVector, Variant::emptyStringVector, AM_DEFAULT);
     URHO3D_ACCESSOR_ATTRIBUTE("Position", GetPosition, SetPosition, Vector3, Vector3::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Rotation", GetRotation, SetRotation, Quaternion, Quaternion::IDENTITY, AM_FILE);
+    URHO3D_ACCESSOR_ATTRIBUTE("RotationEuler", GetRotationEuler, SetRotationEuler, Vector3, Vector3::ZERO, AM_FILE);
     URHO3D_ACCESSOR_ATTRIBUTE("Scale", GetScale, SetScale, Vector3, Vector3::ONE, AM_DEFAULT);
     URHO3D_ATTRIBUTE("Variables", VariantMap, vars_, Variant::emptyVariantMap, AM_FILE); // Network replication of vars uses custom data
     URHO3D_ACCESSOR_ATTRIBUTE("Network Position", GetNetPositionAttr, SetNetPositionAttr, Vector3, Vector3::ZERO,
@@ -453,6 +455,13 @@ void Node::SetRotation(const Quaternion& rotation)
     MarkDirty();
 
     MarkNetworkUpdate();
+}
+
+void Node::SetRotationEuler(const Vector3& eulerAngles)
+{
+    rotationEuler_ = eulerAngles;
+    Quaternion q = Quaternion( eulerAngles.y_, Vector3::UP ) * Quaternion( eulerAngles.x_, Vector3::RIGHT ) * Quaternion( eulerAngles.z_, Vector3::FORWARD );
+    SetRotation(q);
 }
 
 void Node::SetDirection(const Vector3& direction)

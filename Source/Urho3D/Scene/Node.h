@@ -1,4 +1,4 @@
-//
+﻿//
 // Copyright (c) 2008-2017 the Urho3D project.
 //
 // Permission is hereby granted, free of charge, to any person obtaining a copy
@@ -138,6 +138,8 @@ public:
 
     /// Set rotation in parent space.
     void SetRotation(const Quaternion& rotation);
+
+    void SetRotationEuler(const Vector3& eulerAngles);
 
     /// Set rotation in parent space (for Urho2D).
     void SetRotation2D(float rotation) { SetRotation(Quaternion(rotation)); }
@@ -375,6 +377,7 @@ public:
 
     /// Return rotation in parent space.
     const Quaternion& GetRotation() const { return rotation_; }
+    const Vector3& GetRotationEuler() const { return rotationEuler_; } // From Editors only, not synchronized with the quaternion
 
     /// Return rotation in parent space (for Urho2D).
     float GetRotation2D() const { return rotation_.RollAngle(); }
@@ -683,6 +686,8 @@ private:
     Vector3 position_;
     /// Rotation.
     Quaternion rotation_;
+    /// Rotation euler
+    Vector3 rotationEuler_;
     /// Scale.
     Vector3 scale_;
     /// World-space rotation.
