@@ -113,6 +113,8 @@ public:
     /// Set window position. Sets initial position if window is not created yet.
     void SetWindowPosition(int x, int y);
     /// Set screen mode. Return true if successful.
+    Vector3 GetDisplayDPI(int monitor = 0) const;
+    /// Set screen mode. Return true if successful.
     bool SetMode(int width, int height, int multisample, void* glContext, unsigned int iDefaultFrameBuffer );
     bool SetMode
         (int width, int height, bool fullscreen, bool borderless, bool resizable, bool highDPI, bool vsync, bool tripleBuffer,

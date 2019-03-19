@@ -103,6 +103,13 @@ void Graphics::SetOrientations(const String& orientations)
         SDL_SetHint(SDL_HINT_ORIENTATIONS, orientations_.CString());
 }
 
+Vector3 Graphics::GetDisplayDPI(int monitor) const
+{
+    Vector3 result;
+    SDL_GetDisplayDPI(monitor, &result.z_, &result.x_, &result.y_);
+    return result;
+}
+
 bool Graphics::ToggleFullscreen()
 {
     return SetMode(width_, height_, !fullscreen_, borderless_, resizable_, highDPI_, vsync_, tripleBuffer_, multiSample_, monitor_, refreshRate_);
