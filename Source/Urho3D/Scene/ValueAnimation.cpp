@@ -99,7 +99,7 @@ ValueAnimation::ValueAnimation(Context* context) :
     endTime_(-M_INFINITY),
     splineTangentsDirty_(false)
 {
-    phantomKey_.time_ = -NAN;
+    phantomKey_.time_ = -M_INFINITY;
     phantomKey_.value_ = Variant();
 }
 
@@ -380,7 +380,7 @@ int ValueAnimation::MoveKeyFrame( int id, float time )
             return id;
 
     VAnimKeyFrame deletedKeyFrame = DeleteKeyFrame( id );
-    if ( deletedKeyFrame.time_ != -NAN )
+    if ( deletedKeyFrame.time_ != -M_INFINITY )
         if( SetKeyFrame( time, deletedKeyFrame.value_ ) )
             for (unsigned i = 0; i < keyFrames_.Size(); ++i)
                  if ( time == keyFrames_[i].time_)
@@ -431,7 +431,7 @@ bool ValueAnimation::SetKeyFrame(float time, const Variant& value, bool phantom)
 VAnimKeyFrame ValueAnimation::DeleteKeyFrame( int id )
 {
     VAnimKeyFrame keyframe;
-    keyframe.time_ = -NAN;
+    keyframe.time_ = -M_INFINITY;
 
     if ( !keyFrames_.Empty() )
     {
@@ -500,7 +500,7 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime, const Variant &curre
             else if( !prev.value_.IsEmpty() )
             {
                 // reset phantom
-                phantomKey_.time_ = -NAN;
+                phantomKey_.time_ = -M_INFINITY;
                 phantomKey_.value_ = Variant();
             }
             break;
@@ -508,7 +508,7 @@ Variant ValueAnimation::GetAnimationValue(float scaledTime, const Variant &curre
         else if( index == keyFrames_.Size() - 1 )
         {
             // reset phantom
-            phantomKey_.time_ = -NAN;
+            phantomKey_.time_ = -M_INFINITY;
             phantomKey_.value_ = Variant();
         }
     }
